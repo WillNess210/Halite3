@@ -1,8 +1,8 @@
 package hlt;
 
 public class Position {
-    public final int x;
-    public final int y;
+    public int x;
+    public int y;
 
     public Position(final int x, final int y) {
         this.x = x;
