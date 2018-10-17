@@ -1,5 +1,6 @@
 package hlt;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class Player {
 
     void _update(final int numShips, final int numDropoffs, final int halite) {
         this.halite = halite;
-        
+        ArrayList<EntityId> onlyAllowedIDs = new ArrayList<EntityId>();
         for (int i = 0; i < numShips; ++i) {
             Ship generatedShip = Ship._generate(id);
             if(ships.containsKey(generatedShip.id)) {
@@ -27,8 +28,17 @@ public class Player {
             }else {
                 ships.put(generatedShip.id, generatedShip);
             }
+            onlyAllowedIDs.add(generatedShip.id);
         }
-
+        ArrayList<EntityId> toRemove = new ArrayList<EntityId>();
+        for(EntityId id : ships.keySet()) {
+        	if(!onlyAllowedIDs.contains(id)) {
+        		toRemove.add(id);
+        	}
+        }
+        for(EntityId id : toRemove) {
+        	ships.remove(id);
+        }
         dropoffs.clear();
         for (int i = 0; i < numDropoffs; ++i) {
             final Dropoff dropoff = Dropoff._generate(id);
