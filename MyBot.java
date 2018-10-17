@@ -31,7 +31,7 @@ public class MyBot{
 				ship.log();
 				CommandQueue.add(ship.getCommand(me, gameMap, rng));
 			}
-			gameMap.logTunnelView(me);
+			gameMap.logTunnelView(me, me.tunnelMap);
 			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied()){
 				CommandQueue.addSpawn(me);
 				Log.log("Spawning a ship.");

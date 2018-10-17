@@ -35,6 +35,7 @@ public class Ship extends Entity{
 	public Command getCommand(Player me, GameMap gameMap, Random rng) {
 		// If there is significant Halite underneath me, I should mine
 		if(gameMap.at(this).halite > Constants.MAX_HALITE/10 && !this.isFull()) {
+			me.tunnelMap[this.getX()][this.getY()] = 2;
 			return this.stayStill();
 		}
 		// I should find out if I should deposit
