@@ -1,6 +1,7 @@
 // This Java API uses camelCase instead of the snake_case as documented in the API docs.
 //     Otherwise the names of methods are consistent.
 import hlt.*;
+import wln.CommandQueue;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,28 +15,25 @@ public class MyBot{
 		}
 		final Random rng = new Random(rngSeed);
 		Game game = new Game();
-		// At this point "game" variable is populated with initial map data.
-		// This is a good place to do computationally expensive start-up pre-processing.
-		// As soon as you call "ready" function below, the 2 second per turn timer will
-		// start.
 		game.ready("MyJavaBot");
+		CommandQueue.init();
 		Log.log("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
 		for(;;){
 			game.updateFrame();
 			Player me = game.me;
 			GameMap gameMap = game.gameMap;
-			ArrayList<Command> commandQueue = new ArrayList<>();
+			CommandQueue.clear();
 			for(Ship ship : me.ships.values()){
 				ship.updateStats(me);
 				ship.log();
-				commandQueue.add(ship.getCommand(me, gameMap, rng));
+				CommandQueue.add(ship.getCommand(me, gameMap, rng));
 			}
 			gameMap.log();
 			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied()){
-				commandQueue.add(me.shipyard.spawn());
+				CommandQueue.addSpawn(me);
 				Log.log("Spawning a ship.");
 			}
-			game.endTurn(commandQueue);
+			game.endTurn();
 		}
 	}
 }
