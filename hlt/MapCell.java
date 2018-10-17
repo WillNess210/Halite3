@@ -22,7 +22,9 @@ public class MapCell {
     public boolean hasStructure() {
         return structure != null;
     }
-
+    public int getFactorOfHundred() {
+    	return (int)this.halite/100;
+    }
     public void markUnsafe(final Ship ship) {
         this.ship = ship;
     }

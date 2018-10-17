@@ -26,20 +26,14 @@ public class MyBot{
 			GameMap gameMap = game.gameMap;
 			ArrayList<Command> commandQueue = new ArrayList<>();
 			for(Ship ship : me.ships.values()){
-				ship.turnsSinceDropoff++;
-				Log.log(ship.id + ": " + ship.turnsSinceDropoff);
-				if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
-					Position rP = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
-					commandQueue.add(ship.move(gameMap.naiveNavigate(ship, rP)));
-				}else if(ship.halite > 500) {
-					Position rP = me.shipyard.position;
-					commandQueue.add(ship.move(gameMap.naiveNavigate(ship, rP)));
-				}else{
-					commandQueue.add(ship.stayStill());
-				}
+				ship.updateStats(me);
+				ship.log();
+				commandQueue.add(ship.getCommand(me, gameMap, rng));
 			}
-			if(game.turnNumber <= 200 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied()){
+			gameMap.log();
+			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied()){
 				commandQueue.add(me.shipyard.spawn());
+				Log.log("Spawning a ship.");
 			}
 			game.endTurn(commandQueue);
 		}

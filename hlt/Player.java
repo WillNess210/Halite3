@@ -5,10 +5,10 @@ import java.util.Map;
 
 public class Player {
     public final PlayerId id;
-    public final Shipyard shipyard;
+    public Shipyard shipyard;
     public int halite;
-    public final Map<EntityId, Ship> ships = new LinkedHashMap<>();
-    public final Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
+    public Map<EntityId, Ship> ships = new LinkedHashMap<>();
+    public Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
 
     private Player(final PlayerId id, final Shipyard shipyard) {
         this.id = id;
@@ -17,11 +17,16 @@ public class Player {
 
     void _update(final int numShips, final int numDropoffs, final int halite) {
         this.halite = halite;
-
-        ships.clear();
+        
         for (int i = 0; i < numShips; ++i) {
-            final Ship ship = Ship._generate(id);
-            ships.put(ship.id, ship);
+            Ship generatedShip = Ship._generate(id);
+            if(ships.containsKey(generatedShip.id)) {
+            	ships.get(generatedShip.id).halite = generatedShip.halite;
+            	ships.get(generatedShip.id).position.x = generatedShip.position.x;
+            	ships.get(generatedShip.id).position.y = generatedShip.position.y;
+            }else {
+                ships.put(generatedShip.id, generatedShip);
+            }
         }
 
         dropoffs.clear();

@@ -25,7 +25,9 @@ public class GameMap {
     public MapCell at(final Entity entity) {
         return at(entity.position);
     }
-
+    public MapCell at(final int x, final int y) {
+    	return cells[y][x];
+    }
     public int calculateDistance(final Position source, final Position target) {
         final Position normalizedSource = normalize(source);
         final Position normalizedTarget = normalize(target);
@@ -119,5 +121,16 @@ public class GameMap {
         }
 
         return map;
+    }
+    public void log(){
+    	Log.log(this.at(0, 7).halite + "");
+    	for(int j = 0; j < this.height; j++) {
+    		String rowString = "";
+    		for(int i = 0; i < this.width; i++) {
+    			rowString += this.at(i, j).getFactorOfHundred();
+    			rowString += " ";
+    		}
+    		Log.log(rowString);
+    	}
     }
 }
