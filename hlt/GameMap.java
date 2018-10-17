@@ -1,6 +1,7 @@
 package hlt;
 
 import java.util.ArrayList;
+import wln.CollisionAvoidance;
 
 public class GameMap {
     public final int width;
@@ -77,7 +78,7 @@ public class GameMap {
         // getUnsafeMoves normalizes for us
         for (final Direction direction : getUnsafeMoves(ship.position, destination)) {
             final Position targetPos = ship.position.directionalOffset(direction);
-            if (!at(targetPos).isOccupied()) {
+            if (!at(targetPos).isOccupied() && CollisionAvoidance.isSafe(targetPos)) {
                 at(targetPos).markUnsafe(ship);
                 return direction;
             }

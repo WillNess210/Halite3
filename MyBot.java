@@ -1,6 +1,7 @@
 // This Java API uses camelCase instead of the snake_case as documented in the API docs.
 //     Otherwise the names of methods are consistent.
 import hlt.*;
+import wln.CollisionAvoidance;
 import wln.CommandQueue;
 import java.util.ArrayList;
 import java.util.Random;
@@ -23,6 +24,7 @@ public class MyBot{
 			Player me = game.me;
 			GameMap gameMap = game.gameMap;
 			CommandQueue.clear();
+			CollisionAvoidance.clear();
 			for(Ship ship : me.ships.values()){
 				ship.updateStats(me);
 				ship.log();
