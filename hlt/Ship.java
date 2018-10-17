@@ -48,16 +48,12 @@ public class Ship extends Entity{
 		// Otherwise, I should find something to mine
 		int[][] tunnelMap = me.tunnelMap;
 		Position goal = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
-		int maxScore = -100;
-		for(int i = -2; i <= 2; i++) {
-			for(int j = -2; j <= 2; j++) {
-				if(i != 0 || j != 0) {
-					Position test = gameMap.normalize(new Position(this.getX() + i, this.getY() + j));
-					int score = gameMap.at(test).halite / (Math.abs(i) + Math.abs(j));
-					if(score > maxScore && gameMap.at(test).halite > Constants.MAX_HALITE/10) {
-						goal = test;
-						maxScore = score;
-					}
+		double closest = 1000;
+		for(int i = 0; i < gameMap.width; i++) {
+			for(int j = 0; j < gameMap.height; j++) {
+				if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest) {
+					closest = this.position.distanceTo(new Position(i, j));
+					goal = new Position(i, j);
 				}
 			}
 		}
