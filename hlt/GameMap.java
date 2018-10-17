@@ -76,6 +76,29 @@ public class GameMap{
 		}
 		return Direction.STILL;
 	}
+	
+	// TODO implement wrap-around
+	public Direction aStar(final Ship ship, final Position dest) {
+		int[][] map = new int[this.width][this.height];
+		for(int i = 0; i < this.width; i++) {
+			for(int j = 0; j < this.height; j++) {
+				map[i][j] = -1;
+			}
+		}
+		map = aStarSearch(map, ship.getX(), ship.getY(), 0);
+		return Direction.EAST;
+	}
+	public int[][] aStarSearch(int[][] map, int x, int y, int dist) {
+		if(map[x][y] != -1 && map[x][y] < dist) {
+			return map;
+		}
+		map[x][y] = dist;
+		map = this.aStarSearch(map, normalizeX(x + 1), y, dist + 1);
+		map = this.aStarSearch(map, normalizeX(x - 1), y, dist + 1);
+		map = this.aStarSearch(map, x, normalizeY(y + 1), dist + 1);
+		map = this.aStarSearch(map, x, normalizeY(y - 1), dist + 1);
+		return map;
+	}
 	void _update(){
 		for(int y = 0; y < height; ++y){
 			for(int x = 0; x < width; ++x){
