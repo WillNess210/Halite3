@@ -51,7 +51,7 @@ public class Ship extends Entity{
 		for(int i = -2; i <= 2; i++) {
 			for(int j = -2; j <= 2; j++) {
 				if(i != 0 || j != 0) {
-					Position test = new Position(this.getX() + i, this.getY() + j);
+					Position test = gameMap.normalize(new Position(this.getX() + i, this.getY() + j));
 					int score = gameMap.at(test).halite / (Math.abs(i) + Math.abs(j));
 					if(score > maxScore && gameMap.at(test).halite > Constants.MAX_HALITE/10) {
 						goal = test;
