@@ -46,6 +46,7 @@ public class Ship extends Entity{
 			return this.move(gameMap.naiveNavigate(this, me.shipyard.position));
 		}
 		// Otherwise, I should find something to mine
+		int[][] tunnelMap = me.tunnelMap;
 		Position goal = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
 		int maxScore = -100;
 		for(int i = -2; i <= 2; i++) {

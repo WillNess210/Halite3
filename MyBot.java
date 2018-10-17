@@ -23,6 +23,7 @@ public class MyBot{
 			game.updateFrame();
 			Player me = game.me;
 			GameMap gameMap = game.gameMap;
+			me.tunnelMap = gameMap.getTunnelView(me);
 			CommandQueue.clear();
 			CollisionAvoidance.clear();
 			for(Ship ship : me.ships.values()){

@@ -10,7 +10,7 @@ public class Player {
     public int halite;
     public Map<EntityId, Ship> ships = new LinkedHashMap<>();
     public Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
-
+    public int[][] tunnelMap;
     private Player(final PlayerId id, final Shipyard shipyard) {
         this.id = id;
         this.shipyard = shipyard;
