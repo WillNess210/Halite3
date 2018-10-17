@@ -57,6 +57,7 @@ public class Ship extends Entity{
 				}
 			}
 		}
+		me.tunnelMap[goal.x][goal.y] = 2;
 		return this.move(gameMap.naiveNavigate(this, goal));
 	}
 	public Command makeDropoff(){
