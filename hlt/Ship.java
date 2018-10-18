@@ -1,7 +1,7 @@
 package hlt;
 import java.util.ArrayList;
 import java.util.Random;
-import wln.CollisionAvoidance;
+import wln.*;
 
 public class Ship extends Entity{
 	public int halite, turnsSinceDeposit;
@@ -32,27 +32,27 @@ public class Ship extends Entity{
 			}
 		}
 	}
-	public Command getCommand(Player me, GameMap gameMap, Random rng) {
+	public Command getCommand(Player me, GameMap gameMap, Random rng){
 		// If there is significant Halite underneath me, I should mine
-		if(gameMap.at(this).halite > Constants.MAX_HALITE/10 && !this.isFull()) {
+		if(gameMap.at(this).halite > Constants.MAX_HALITE / 10 && !this.isFull()){
 			me.tunnelMap[this.getX()][this.getY()] = 2;
 			return this.stayStill();
 		}
 		// I should find out if I should deposit
-		if(this.halite > this.minHalite) {
+		if(this.halite > this.minHalite){
 			this.shouldDeposit = true;
 		}
 		// If I'm on my way to deposit, keep going
-		if(this.shouldDeposit) {
-			return this.move(gameMap.naiveNavigate(this, me.shipyard.position));
+		if(this.shouldDeposit){
+			return this.move(gameMap.naiveNavigate(this, me.shipyard.positionp));
 		}
 		// Otherwise, I should find something to mine
 		int[][] tunnelMap = me.tunnelMap;
 		Position goal = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
 		double closest = 1000;
-		for(int i = 0; i < gameMap.width; i++) {
-			for(int j = 0; j < gameMap.height; j++) {
-				if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest) {
+		for(int i = 0; i < gameMap.width; i++){
+			for(int j = 0; j < gameMap.height; j++){
+				if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest){
 					closest = this.position.distanceTo(new Position(i, j));
 					goal = new Position(i, j);
 				}

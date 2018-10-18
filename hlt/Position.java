@@ -35,7 +35,20 @@ public class Position{
 		}
 		return new Position(x + dx, y + dy);
 	}
-	public double distanceTo(Position b) {
+	public Direction getDirectionTo(Position b) {// if point b is one cardinal direction away, then it'll return the direction to that point
+		if(this.x - 1== b.x && this.y == b.y) {
+			return Direction.WEST;
+		}else if(this.x + 1== b.x && this.y == b.y) {
+			return Direction.EAST;
+		}else if(this.x == b.x && this.y - 1== b.y) {
+			return Direction.SOUTH;
+		}else if(this.x == b.x && this.y + 1 == b.y) {
+			return Direction.NORTH;
+		}else {
+			return Direction.STILL;
+		}
+	}
+	public double distanceTo(Position b){
 		return Math.hypot(b.x - this.x, b.y - this.y);
 	}
 	@Override
