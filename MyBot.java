@@ -24,6 +24,10 @@ public class MyBot{
 			GameMap gameMap = game.gameMap;
 			me.tunnelMap = gameMap.getTunnelView(me);
 			CommandQueue.clear();
+			// If an enemy is camping my shipyard, I am okay with suiciding into them
+			if(gameMap.at(me.shipyard).ship.owner.id != me.id.id) {
+				gameMap.at(me.shipyard).ship = null;
+			}
 			for(Ship ship : me.ships.values()){
 				ship.updateStats(me);
 				CommandQueue.add(ship.getCommand(me, gameMap, rng));
