@@ -7,12 +7,14 @@ public class Ship extends Entity{
 	public int halite, turnsSinceDeposit, turnsStill;
 	public boolean shouldDeposit;
 	public final int minHalite = 900;
+	public String logString;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
 		super(owner, id, position);
 		this.halite = halite;
 		this.turnsSinceDeposit = 0;
 		this.shouldDeposit = false;
 		this.turnsStill = 0;
+		logString = "";
 	}
 	public boolean isFull(){
 		return halite >= Constants.MAX_HALITE;
@@ -36,6 +38,7 @@ public class Ship extends Entity{
 	public Command getCommand(Player me, GameMap gameMap, Random rng){
 		// CHECK IF STUCK
 		if(this.turnsStill > 5 && (this.halite > 900 || gameMap.at(this).halite < Constants.MAX_HALITE/10)) { // I'M STUCK
+			this.logString += "STUCK. ";
 			// RANDOMIZE ORDER OF NS
 			ArrayList<Position> nsNonRandom = this.position.getNeighbors(gameMap);
 			ArrayList<Position> ns = new ArrayList<Position>(40);
@@ -51,32 +54,37 @@ public class Ship extends Entity{
 			}
 		}
 		// If there is significant Halite underneath me, I should mine
-		if(gameMap.at(this).halite > Constants.MAX_HALITE / 10 && !this.isFull()){
+		if(gameMap.at(this).halite >= Constants.MAX_HALITE / 10 && !this.isFull()){
+			this.logString += "KEEP MINING. ";
 			me.tunnelMap[this.getX()][this.getY()] = 2;
 			return this.stayStill();
 		}
 		// I should find out if I should deposit
 		if(this.halite > this.minHalite){
+			this.logString += "HEAD BACK TO DEPOSIT. ";
 			this.shouldDeposit = true;
 		}
 		// If I'm on my way to deposit, keep going
 		if(this.shouldDeposit){
 			//return this.move(gameMap.naiveNavigate(this, me.shipyard.position));
+			this.logString += "HEADING BACK TO DEPOSIT. ";
 			Direction toMove = this.aStar(gameMap, me.shipyard.position);
 			return this.move(toMove, gameMap);
 		}
 		// Otherwise, I should find something to mine
+		this.logString += "FIND TO MINE. ";
 		int[][] tunnelMap = me.tunnelMap;
 		Position goal = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
 		double closest = 1000;
 		for(int i = 0; i < gameMap.width; i++){
 			for(int j = 0; j < gameMap.height; j++){
-				if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest){
+				if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest && gameMap.at(i, j).canMoveOn()){
 					closest = this.position.distanceTo(new Position(i, j));
 					goal = new Position(i, j);
 				}
 			}
 		}
+		this.logString += " GOAL MINE IS AT " + goal.toString() + ". ";
 		me.tunnelMap[goal.x][goal.y] = 2;
 		//return this.move(gameMap.naiveNavigate(this, goal), gameMap);
 		return this.move(this.aStar(gameMap, goal), gameMap);
@@ -111,7 +119,7 @@ public class Ship extends Entity{
 			}
 			ArrayList<AStarNode> ns = lowest.neighbors(map);
 			for(AStarNode nbr : ns){
-				if(closed.contains(nbr) || gameMap.cells[nbr.x][nbr.y].isOccupied()){
+				if(closed.contains(nbr) || gameMap.at(nbr.x, nbr.y).isOccupied()){
 					continue;
 				}
 				int possibleDistanceScore = lowest.distTraveled + 1;
@@ -125,7 +133,7 @@ public class Ship extends Entity{
 				
 			}
 		}
-		if(target == null) {
+		if(target == null || target.parent == null) {
 			Log.log("A* pathfinding couldn't find anything");
 			return Direction.STILL;
 		}else {
@@ -141,10 +149,16 @@ public class Ship extends Entity{
 		return Command.transformShipIntoDropoffSite(id);
 	}
 	public Command move(final Direction direction, GameMap gameMap){
-		gameMap.cells[this.getX()][this.getY()].ship = null;
-		Position next = this.position.directionalOffset(direction);
-		gameMap.cells[next.x][next.y].ship = this;
-		return Command.move(id, direction);
+		if(this.halite >= gameMap.at(this).halite/10) { // This is what it costs
+			gameMap.at(this.getX(), this.getY()).ship = null;
+			Position next = this.position.directionalOffset(direction);
+			gameMap.at(next.x, next.y).ship = this;
+			this.halite -= gameMap.at(this).halite/10;
+			return Command.move(id, direction);
+		}else {
+			this.logString += "Not enough Halite to complete requested move. ";
+			return Command.move(id, Direction.STILL);
+		}
 	}
 	public Command stayStill(){
 		return Command.move(id, Direction.STILL);
@@ -180,5 +194,9 @@ public class Ship extends Entity{
 	}
 	public void log(){
 		Log.log(this.toString());
+	}
+	public void logLogString() {
+		Log.log(this.id.id + " " + this.position.toString() + ": " + this.logString);
+		this.logString = "";
 	}
 }

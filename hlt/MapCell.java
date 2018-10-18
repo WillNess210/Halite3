@@ -18,7 +18,6 @@ public class MapCell {
     public boolean canMoveOn() {
     	return ship == null;
     }
-    
     public boolean isOccupied() {
         return ship != null;
     }

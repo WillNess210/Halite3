@@ -15,7 +15,7 @@ public class MyBot{
 		}
 		final Random rng = new Random(rngSeed);
 		Game game = new Game();
-		game.ready("WillNessBot");
+		game.ready("WillNessBotNew");
 		CommandQueue.init();
 		Log.log("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
 		for(;;){
@@ -26,8 +26,8 @@ public class MyBot{
 			CommandQueue.clear();
 			for(Ship ship : me.ships.values()){
 				ship.updateStats(me);
-				//ship.log();
 				CommandQueue.add(ship.getCommand(me, gameMap, rng));
+				ship.logLogString();
 			}
 			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied() && me.ships.size() < 15){
 				CommandQueue.addSpawn(me);

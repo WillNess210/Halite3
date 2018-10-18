@@ -64,8 +64,9 @@ public class Position{
 			return Direction.STILL;
 		}
 	}
+	// TODO implement wraparound
 	public double distanceTo(Position b){
-		return Math.hypot(b.x - this.x, b.y - this.y);
+		return Math.abs(b.x - this.x) + Math.abs(b.y - this.y);
 	}
 	@Override
 	public boolean equals(Object o){
