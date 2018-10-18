@@ -36,7 +36,14 @@ public class Ship extends Entity{
 	public Command getCommand(Player me, GameMap gameMap, Random rng){
 		// CHECK IF STUCK
 		if(this.turnsStill > 5 && (this.halite > 900 || gameMap.at(this).halite < Constants.MAX_HALITE/10)) { // I'M STUCK
-			ArrayList<Position> ns = this.position.getNeighbors(gameMap);
+			ArrayList<Position> nsNonRandom = this.position.getNeighbors(gameMap);
+			ArrayList<Position> ns = new ArrayList<Position>(40);
+			while(nsNonRandom.size() > 0) {
+				Position rand = nsNonRandom.get(rng.nextInt(nsNonRandom.size()));
+				nsNonRandom.remove(rand);
+				ns.add(rand);
+			}
+			// RANDOMIZE ORDER OF NS
 			for(Position p : ns) {
 				if(gameMap.at(p).ship == null && CollisionAvoidance.isSafe(p)) {
 					return this.move(gameMap.naiveNavigate(this, p));
