@@ -46,6 +46,13 @@ public class Game{
 			}
 		}
 	}
+	public int getTurnsLeft() {
+		return this.getLastGameTurn() - this.turnNumber;
+	}
+	public int getLastGameTurn() {
+		double slope = 100/32;
+		return (int)(400 + (slope * (gameMap.width - 32)));
+	}
 	public void endTurn(final Collection<Command> commands){
 		for(final Command command : commands){
 			System.out.print(command.command);

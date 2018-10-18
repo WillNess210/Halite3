@@ -5,7 +5,7 @@ public class GameMap{
 	public final int width;
 	public final int height;
 	public final MapCell[][] cells;
-	public final int minHaliteWall = 100;
+	public int minHaliteWall = 100;
 	public GameMap(final int width, final int height){
 		this.width = width;
 		this.height = height;

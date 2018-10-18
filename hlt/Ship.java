@@ -35,7 +35,7 @@ public class Ship extends Entity{
 			}
 		}
 	}
-	public Command getCommand(Player me, GameMap gameMap, Random rng){
+	public Command getCommand(Player me, GameMap gameMap, Game game, Random rng){
 		// CHECK IF STUCK
 		if(this.turnsStill > 5 && (this.halite > 900 || gameMap.at(this).halite < Constants.MAX_HALITE/10)) { // I'M STUCK
 			this.logString += "STUCK. ";
@@ -52,6 +52,11 @@ public class Ship extends Entity{
 					return this.move(this.aStar(gameMap, p), gameMap);
 				}
 			}
+		}
+		// If I should be heading back to suicide, let's do so
+		if(game.getTurnsLeft() < 100 && this.position.distanceTo(me.shipyard.position) + 8 >= game.getTurnsLeft()) {
+			gameMap.at(me.shipyard.position).ship = null; // clear to allow for collisions
+			return this.move(this.aStar(gameMap, me.shipyard.position), gameMap);
 		}
 		// If there is significant Halite underneath me, I should mine
 		if(gameMap.at(this).halite >= Constants.MAX_HALITE / 10 && !this.isFull()){
