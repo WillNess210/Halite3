@@ -5,11 +5,11 @@ import hlt.Position;
 
 public class AStarNode extends Position{
 	public AStarNode parent;
-	public double distTraveled, distFrom;
+	public int distTraveled, distFrom;
 	public AStarNode(int x, int y){
 		super(x, y);
 		parent = null;
-		distTraveled = 9999;
+		distTraveled = 0;
 		distFrom = 9999;
 	}
 	public ArrayList<AStarNode> neighbors(AStarNode[][] map){

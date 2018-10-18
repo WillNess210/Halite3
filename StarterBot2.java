@@ -28,7 +28,7 @@ public class StarterBot2{
 			for(final Ship ship : me.ships.values()){
 				if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
 					final Position randomPosition = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
-					commandQueue.add(ship.move(gameMap.naiveNavigate(ship, randomPosition)));
+					commandQueue.add(ship.move(ship.aStar(gameMap, randomPosition), gameMap));
 				}else{
 					commandQueue.add(ship.stayStill());
 				}

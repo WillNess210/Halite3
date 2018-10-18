@@ -1,7 +1,6 @@
 // This Java API uses camelCase instead of the snake_case as documented in the API docs.
 //     Otherwise the names of methods are consistent.
 import hlt.*;
-import wln.CollisionAvoidance;
 import wln.CommandQueue;
 import java.util.ArrayList;
 import java.util.Random;
@@ -16,7 +15,7 @@ public class MyBot{
 		}
 		final Random rng = new Random(rngSeed);
 		Game game = new Game();
-		game.ready("MyJavaBot");
+		game.ready("WillNessBot");
 		CommandQueue.init();
 		Log.log("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
 		for(;;){
@@ -25,10 +24,9 @@ public class MyBot{
 			GameMap gameMap = game.gameMap;
 			me.tunnelMap = gameMap.getTunnelView(me);
 			CommandQueue.clear();
-			CollisionAvoidance.clear();
 			for(Ship ship : me.ships.values()){
 				ship.updateStats(me);
-				ship.log();
+				//ship.log();
 				CommandQueue.add(ship.getCommand(me, gameMap, rng));
 			}
 			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied() && me.ships.size() < 15){

@@ -34,7 +34,7 @@ public class StarterBot {
             for (final Ship ship : me.ships.values()) {
                 if (gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()) {
                     final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
-                    commandQueue.add(ship.move(randomDirection));
+                    commandQueue.add(ship.move(randomDirection, gameMap));
                 } else {
                     commandQueue.add(ship.stayStill());
                 }

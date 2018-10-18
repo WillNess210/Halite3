@@ -56,9 +56,9 @@ public class Position{
 			return Direction.WEST;
 		}else if(this.x + 1== b.x && this.y == b.y) {
 			return Direction.EAST;
-		}else if(this.x == b.x && this.y - 1== b.y) {
+		}else if(this.x == b.x && this.y + 1== b.y) {
 			return Direction.SOUTH;
-		}else if(this.x == b.x && this.y + 1 == b.y) {
+		}else if(this.x == b.x && this.y - 1 == b.y) {
 			return Direction.NORTH;
 		}else {
 			return Direction.STILL;

@@ -36,6 +36,7 @@ public class Ship extends Entity{
 	public Command getCommand(Player me, GameMap gameMap, Random rng){
 		// CHECK IF STUCK
 		if(this.turnsStill > 5 && (this.halite > 900 || gameMap.at(this).halite < Constants.MAX_HALITE/10)) { // I'M STUCK
+			// RANDOMIZE ORDER OF NS
 			ArrayList<Position> nsNonRandom = this.position.getNeighbors(gameMap);
 			ArrayList<Position> ns = new ArrayList<Position>(40);
 			while(nsNonRandom.size() > 0) {
@@ -43,10 +44,9 @@ public class Ship extends Entity{
 				nsNonRandom.remove(rand);
 				ns.add(rand);
 			}
-			// RANDOMIZE ORDER OF NS
 			for(Position p : ns) {
-				if(gameMap.at(p).ship == null && CollisionAvoidance.isSafe(p)) {
-					return this.move(gameMap.naiveNavigate(this, p));
+				if(gameMap.at(p).canMoveOn()) {
+					return this.move(this.aStar(gameMap, p), gameMap);
 				}
 			}
 		}
@@ -61,7 +61,9 @@ public class Ship extends Entity{
 		}
 		// If I'm on my way to deposit, keep going
 		if(this.shouldDeposit){
-			return this.move(gameMap.naiveNavigate(this, me.shipyard.position));
+			//return this.move(gameMap.naiveNavigate(this, me.shipyard.position));
+			Direction toMove = this.aStar(gameMap, me.shipyard.position);
+			return this.move(toMove, gameMap);
 		}
 		// Otherwise, I should find something to mine
 		int[][] tunnelMap = me.tunnelMap;
@@ -76,13 +78,72 @@ public class Ship extends Entity{
 			}
 		}
 		me.tunnelMap[goal.x][goal.y] = 2;
-		return this.move(gameMap.naiveNavigate(this, goal));
+		//return this.move(gameMap.naiveNavigate(this, goal), gameMap);
+		return this.move(this.aStar(gameMap, goal), gameMap);
+	}
+	public Direction aStar(GameMap gameMap, Position goal) {
+		AStarNode[][] map = new AStarNode[gameMap.width][gameMap.height];
+		// initializing array
+		for(int i = 0; i < map.length; i++) {
+			for(int j = 0; j < map[i].length; j++) {
+				map[i][j] = new AStarNode(i, j);
+				// TODO ADD IN WRAPPING LOGIC
+				map[i][j].distFrom = (Math.abs(goal.x - i) + Math.abs(goal.y - j)) * 2;
+			}
+		}
+		ArrayList<AStarNode> open = new ArrayList<AStarNode>();
+		ArrayList<AStarNode> closed = new ArrayList<AStarNode>();
+		map[this.getX()][this.getY()].distTraveled = 0;
+		open.add(map[this.getX()][this.getY()]);
+		AStarNode target = null;
+		while(open.size() > 0) {
+			AStarNode lowest = open.get(0);
+			for(AStarNode test : open) {
+				if(test.score() < lowest.score()) {
+					lowest = test;
+				}
+			}
+			open.remove(lowest);
+			closed.add(lowest);
+			if(lowest.x == goal.x && lowest.y == goal.y) {
+				target = lowest;
+				break;
+			}
+			ArrayList<AStarNode> ns = lowest.neighbors(map);
+			for(AStarNode nbr : ns){
+				if(closed.contains(nbr) || gameMap.cells[nbr.x][nbr.y].isOccupied()){
+					continue;
+				}
+				int possibleDistanceScore = lowest.distTraveled + 1;
+				if(!open.contains(nbr)){
+					open.add(nbr);
+				}else if(possibleDistanceScore >= nbr.distTraveled) {
+					continue;
+				}
+				nbr.parent = lowest;
+				nbr.distTraveled = possibleDistanceScore;
+				
+			}
+		}
+		if(target == null) {
+			Log.log("A* pathfinding couldn't find anything");
+			return Direction.STILL;
+		}else {
+			while(target.parent.parent != null) {
+				target = target.parent;
+			}
+			// target is now our next position
+			return this.position.getDirectionTo(target);
+		}
+		
 	}
 	public Command makeDropoff(){
 		return Command.transformShipIntoDropoffSite(id);
 	}
-	public Command move(final Direction direction){
-		CollisionAvoidance.add(this.position.directionalOffset(direction));
+	public Command move(final Direction direction, GameMap gameMap){
+		gameMap.cells[this.getX()][this.getY()].ship = null;
+		Position next = this.position.directionalOffset(direction);
+		gameMap.cells[next.x][next.y].ship = this;
 		return Command.move(id, direction);
 	}
 	public Command stayStill(){
