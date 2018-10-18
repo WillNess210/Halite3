@@ -23,6 +23,11 @@ public class Player {
             Ship generatedShip = Ship._generate(id);
             if(ships.containsKey(generatedShip.id)) {
             	ships.get(generatedShip.id).halite = generatedShip.halite;
+            	if(ships.get(generatedShip.id).position.equals(generatedShip.position)) {
+            		ships.get(generatedShip.id).turnsStill++;
+            	}else {
+            		ships.get(generatedShip.id).turnsStill = 0;
+            	}
             	ships.get(generatedShip.id).position.x = generatedShip.position.x;
             	ships.get(generatedShip.id).position.y = generatedShip.position.y;
             }else {

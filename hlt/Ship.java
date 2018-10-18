@@ -4,14 +4,15 @@ import java.util.Random;
 import wln.*;
 
 public class Ship extends Entity{
-	public int halite, turnsSinceDeposit;
+	public int halite, turnsSinceDeposit, turnsStill;
 	public boolean shouldDeposit;
 	public final int minHalite = 900;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
 		super(owner, id, position);
 		this.halite = halite;
-		turnsSinceDeposit = 0;
+		this.turnsSinceDeposit = 0;
 		this.shouldDeposit = false;
+		this.turnsStill = 0;
 	}
 	public boolean isFull(){
 		return halite >= Constants.MAX_HALITE;
@@ -33,6 +34,15 @@ public class Ship extends Entity{
 		}
 	}
 	public Command getCommand(Player me, GameMap gameMap, Random rng){
+		// CHECK IF STUCK
+		if(this.turnsStill > 5 && (this.halite > 900 || gameMap.at(this).halite < Constants.MAX_HALITE/10)) { // I'M STUCK
+			ArrayList<Position> ns = this.position.getNeighbors(gameMap);
+			for(Position p : ns) {
+				if(gameMap.at(p).ship == null && CollisionAvoidance.isSafe(p)) {
+					return this.move(gameMap.naiveNavigate(this, p));
+				}
+			}
+		}
 		// If there is significant Halite underneath me, I should mine
 		if(gameMap.at(this).halite > Constants.MAX_HALITE / 10 && !this.isFull()){
 			me.tunnelMap[this.getX()][this.getY()] = 2;
@@ -44,7 +54,7 @@ public class Ship extends Entity{
 		}
 		// If I'm on my way to deposit, keep going
 		if(this.shouldDeposit){
-			return this.move(gameMap.naiveNavigate(this, me.shipyard.positionp));
+			return this.move(gameMap.naiveNavigate(this, me.shipyard.position));
 		}
 		// Otherwise, I should find something to mine
 		int[][] tunnelMap = me.tunnelMap;

@@ -31,7 +31,7 @@ public class MyBot{
 				ship.log();
 				CommandQueue.add(ship.getCommand(me, gameMap, rng));
 			}
-			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied()){
+			if(game.turnNumber <= 300 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied() && me.ships.size() < 8){
 				CommandQueue.addSpawn(me);
 				Log.log("Spawning a ship.");
 			}

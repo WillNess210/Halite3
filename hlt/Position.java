@@ -1,4 +1,7 @@
 package hlt;
+
+import java.util.ArrayList;
+
 public class Position{
 	public int x;
 	public int y;
@@ -34,6 +37,19 @@ public class Position{
 				throw new IllegalStateException("Unknown direction " + d);
 		}
 		return new Position(x + dx, y + dy);
+	}
+	public ArrayList<Position> getNeighbors(GameMap gameMap) {
+		ArrayList<Position> ns = new ArrayList<Position>();
+		ns.add(new Position(this.x - 1, this.y).normalized(gameMap));
+		ns.add(new Position(this.x + 1, this.y).normalized(gameMap));
+		ns.add(new Position(this.x, this.y - 1).normalized(gameMap));
+		ns.add(new Position(this.x, this.y + 1).normalized(gameMap));
+		return ns;
+	}
+	public Position normalized(GameMap gameMap) {
+		int nx = ((this.x % gameMap.width) + gameMap.width) % gameMap.width;
+		int ny = ((this.y % gameMap.height) + gameMap.height) % gameMap.height;
+		return new Position(nx, ny);
 	}
 	public Direction getDirectionTo(Position b) {// if point b is one cardinal direction away, then it'll return the direction to that point
 		if(this.x - 1== b.x && this.y == b.y) {
