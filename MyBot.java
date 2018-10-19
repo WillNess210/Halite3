@@ -11,7 +11,7 @@ public class MyBot{
 		Game game = new Game();
 		game.ready("WillBot");
 		Log.logln("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
-		for(;;){
+		while(true){
 			game.updateFrame();
 			CommandQueue.clear();
 			final Player me = game.me;
