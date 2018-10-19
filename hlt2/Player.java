@@ -2,7 +2,6 @@ package hlt2;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class Player{
 	public final PlayerId id;
@@ -15,7 +14,6 @@ public class Player{
 		this.shipyard = shipyard;
 	}
 	public void runTurn(Game game, GameMap gameMap) {
-		Random rng = new Random();
 		for(final Ship ship : ships.values()){
 			CommandQueue.add(ship.getTurn(game, gameMap, this));
 			ship.log();
