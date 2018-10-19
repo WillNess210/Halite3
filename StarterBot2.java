@@ -1,8 +1,6 @@
-// This Java API uses camelCase instead of the snake_case as documented in the API docs.
-//     Otherwise the names of methods are consistent.
-import hlt.*;
 import java.util.ArrayList;
 import java.util.Random;
+import hlt.*;
 
 public class StarterBot2{
 	public static void main(final String[] args){
@@ -19,7 +17,7 @@ public class StarterBot2{
 		// As soon as you call "ready" function below, the 2 second per turn timer will
 		// start.
 		game.ready("MyJavaBot");
-		Log.log("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
+		Log.logln("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
 		for(;;){
 			game.updateFrame();
 			final Player me = game.me;

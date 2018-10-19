@@ -40,7 +40,7 @@ public class Constants {
         }
 
         if ((tokens.size() % 2) != 0) {
-            Log.log("Error: constants: expected even total number of key and value tokens from server.");
+            Log.logln("Error: constants: expected even total number of key and value tokens from server.");
             throw new IllegalStateException();
         }
 
@@ -78,7 +78,7 @@ public class Constants {
             case "true": return true;
             case "false": return false;
             default:
-                Log.log("Error: constants: " + key + " constant has value of '" + stringValue +
+                Log.logln("Error: constants: " + key + " constant has value of '" + stringValue +
                     "' from server. Do not know how to parse that as boolean.");
                 throw new IllegalStateException();
         }
@@ -86,7 +86,7 @@ public class Constants {
 
     private static String getString(final Map<String, String> map, final String key) {
         if (!map.containsKey(key)) {
-            Log.log("Error: constants: server did not send " + key + " constant.");
+            Log.logln("Error: constants: server did not send " + key + " constant.");
             throw new IllegalStateException();
         }
         return map.get(key);
