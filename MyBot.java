@@ -10,7 +10,6 @@ public class MyBot{
 		}else{
 			rngSeed = System.nanoTime();
 		}
-		final Random rng = new Random(rngSeed);
 		Game game = new Game();
 		game.ready("WillBot");
 		Log.logln("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
@@ -18,19 +17,7 @@ public class MyBot{
 			game.updateFrame();
 			CommandQueue.clear();
 			final Player me = game.me;
-			final GameMap gameMap = game.gameMap;
-			for(final Ship ship : me.ships.values()){
-				if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
-					final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
-					CommandQueue.add(ship.move(randomDirection, gameMap));
-				}else{
-					CommandQueue.add(ship.stayStill());
-				}
-				ship.log();
-			}
-			if(game.turnNumber <= 200 && me.halite >= Constants.SHIP_COST && !gameMap.at(me.shipyard).isOccupied()){
-				CommandQueue.add(me.shipyard.spawn());
-			}
+			me.runTurn(game, game.gameMap);
 			game.endTurn();
 			Log.logln("");
 		}

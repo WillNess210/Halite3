@@ -2,6 +2,7 @@ package hlt2;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Player{
 	public final PlayerId id;
@@ -14,6 +15,7 @@ public class Player{
 		this.shipyard = shipyard;
 	}
 	public void runTurn(Game game, GameMap gameMap) {
+		Random rng = new Random();
 		for(final Ship ship : ships.values()){
 			if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
 				final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
@@ -23,7 +25,7 @@ public class Player{
 			}
 			ship.log();
 		}
-		if(game.turnNumber <= 200 && me.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
+		if(game.turnNumber <= 200 && this.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
 			CommandQueue.add(shipyard.spawn());
 		}
 	}
