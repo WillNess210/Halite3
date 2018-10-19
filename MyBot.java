@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.Random;
 import hlt2.*;
 
 public class MyBot{

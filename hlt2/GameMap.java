@@ -75,10 +75,7 @@ public class GameMap {
         // getUnsafeMoves normalizes for us
         for (final Direction direction : getUnsafeMoves(ship.position, destination)) {
             final Position targetPos = ship.position.directionalOffset(direction);
-            if (!at(targetPos).isOccupied()) {
-                at(targetPos).markUnsafe(ship);
-                return direction;
-            }
+            return direction;
         }
 
         return Direction.STILL;

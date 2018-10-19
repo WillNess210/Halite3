@@ -17,12 +17,7 @@ public class Player{
 	public void runTurn(Game game, GameMap gameMap) {
 		Random rng = new Random();
 		for(final Ship ship : ships.values()){
-			if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
-				final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
-				CommandQueue.add(ship.move(randomDirection, gameMap));
-			}else{
-				CommandQueue.add(ship.stayStill());
-			}
+			CommandQueue.add(ship.getTurn(game, gameMap, this));
 			ship.log();
 		}
 		if(game.turnNumber <= 200 && this.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){

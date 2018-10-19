@@ -1,10 +1,24 @@
 package hlt2;
+import java.util.Random;
+
 public class Ship extends Entity{
 	public int halite, turnsAlive;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
 		super(owner, id, position);
 		this.halite = halite;
 		this.turnsAlive = 0;
+	}
+	public Command getTurn(Game game, GameMap gameMap, Player me){
+		if(gameMap.at(this).halite > 10 && !this.isFull()){
+			return this.stayStill();
+		}else if(this.isFull()){
+			Direction d = gameMap.naiveNavigate(this, me.shipyard.position);
+			return this.move(d, gameMap);
+		}else{
+			Random rng = new Random();
+			final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
+			return this.move(randomDirection, gameMap);
+		}
 	}
 	public boolean isFull(){
 		return halite >= Constants.MAX_HALITE;
@@ -13,10 +27,13 @@ public class Ship extends Entity{
 		return Command.transformShipIntoDropoffSite(id);
 	}
 	public Command move(final Direction direction, GameMap gameMap){
-		if(this.halite >= gameMap.at(this).halite/10) {
+		if(this.halite >= gameMap.at(this).halite / 10
+				&& gameMap.at(this.position.directionalOffset(direction)).canMoveOn()){
+			gameMap.at(this).markSafe();
 			this.position = this.position.directionalOffset(direction);
+			gameMap.at(this).markUnsafe(this);
 			return Command.move(id, direction);
-		}else {
+		}else{
 			return Command.move(id, Direction.STILL);
 		}
 	}
@@ -29,12 +46,12 @@ public class Ship extends Entity{
 		this.halite = halite;
 		this.turnsAlive++;
 	}
-	public void log() {
+	public void log(){
 		this.id.logEntityId();
 		Log.addSpace();
 		this.position.log();
 		Log.log(": ");
-		Log.logln(this.turnsAlive + "");
+		Log.logln("(h: " + this.halite + " " + this.isFull() + ")");
 	}
 	static Ship _generate(final PlayerId playerId){
 		final Input input = Input.readInput();

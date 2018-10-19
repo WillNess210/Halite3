@@ -11,11 +11,17 @@ public class MapCell{
 	public boolean isEmpty(){
 		return ship == null && structure == null;
 	}
+	public boolean canMoveOn() {
+		return ship == null;
+	}
 	public boolean isOccupied(){
 		return ship != null;
 	}
 	public boolean hasStructure(){
 		return structure != null;
+	}
+	public void markSafe() {
+		this.ship = null;
 	}
 	public void markUnsafe(final Ship ship){
 		this.ship = ship;
