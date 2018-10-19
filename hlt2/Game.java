@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -45,8 +45,8 @@ public class Game{
 			}
 		}
 	}
-	public void endTurn(final Collection<Command> commands){
-		for(final Command command : commands){
+	public void endTurn(){
+		for(final Command command : CommandQueue.commandQueue){
 			System.out.print(command.command);
 			System.out.print(' ');
 		}

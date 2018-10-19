@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 public class Ship extends Entity{
 	public int halite, turnsAlive;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
@@ -12,8 +12,13 @@ public class Ship extends Entity{
 	public Command makeDropoff(){
 		return Command.transformShipIntoDropoffSite(id);
 	}
-	public Command move(final Direction direction){
-		return Command.move(id, direction);
+	public Command move(final Direction direction, GameMap gameMap){
+		if(this.halite >= gameMap.at(this).halite/10) {
+			this.position = this.position.directionalOffset(direction);
+			return Command.move(id, direction);
+		}else {
+			return Command.move(id, Direction.STILL);
+		}
 	}
 	public Command stayStill(){
 		return Command.move(id, Direction.STILL);

@@ -1,15 +1,8 @@
-package hlt;
-public class EntityId{
-	public static final EntityId NONE = new EntityId(-1);
+package hlt2;
+public class PlayerId{
 	public final int id;
-	public EntityId(int id){
+	public PlayerId(int id){
 		this.id = id;
-	}
-	public void loglnEntityId(){
-		Log.logln(this.id + "");
-	}
-	public void logEntityId(){
-		Log.log(this.id + "");
 	}
 	@Override
 	public String toString(){
@@ -21,8 +14,8 @@ public class EntityId{
 			return true;
 		if(o == null || getClass() != o.getClass())
 			return false;
-		EntityId entityId = (EntityId) o;
-		return id == entityId.id;
+		PlayerId playerId = (PlayerId) o;
+		return id == playerId.id;
 	}
 	@Override
 	public int hashCode(){

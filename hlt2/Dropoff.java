@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 
 public class Dropoff extends Entity {
     public Dropoff(final PlayerId owner, final EntityId id, final Position position) {

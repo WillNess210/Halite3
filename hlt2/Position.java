@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 public class Position{
 	public int x, y;
 	public Position(final int x, final int y){

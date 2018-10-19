@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 public class Shipyard extends Entity{
 	public Shipyard(final PlayerId owner, final Position position){
 		super(owner, EntityId.NONE, position);

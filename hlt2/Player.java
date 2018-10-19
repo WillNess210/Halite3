@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,6 +12,20 @@ public class Player{
 	private Player(final PlayerId id, final Shipyard shipyard){
 		this.id = id;
 		this.shipyard = shipyard;
+	}
+	public void runTurn(Game game, GameMap gameMap) {
+		for(final Ship ship : ships.values()){
+			if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
+				final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
+				CommandQueue.add(ship.move(randomDirection, gameMap));
+			}else{
+				CommandQueue.add(ship.stayStill());
+			}
+			ship.log();
+		}
+		if(game.turnNumber <= 200 && me.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
+			CommandQueue.add(shipyard.spawn());
+		}
 	}
 	void _update(final int numShips, final int numDropoffs, final int halite){
 		this.halite = halite;

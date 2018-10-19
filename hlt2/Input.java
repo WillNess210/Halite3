@@ -1,4 +1,4 @@
-package hlt;
+package hlt2;
 public class Input{
 	private final String[] input;
 	private int current;

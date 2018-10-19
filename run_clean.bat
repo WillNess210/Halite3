@@ -4,5 +4,5 @@ rm replays/*.log
 rm replays/*.hlt
 rm *.hlt
 rm *.class
-rm hlt/*.class
+rm hlt2/*.class
 rm wln/*.class
