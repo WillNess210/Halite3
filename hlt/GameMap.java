@@ -90,6 +90,17 @@ public class GameMap{
 			cells[y][x].halite = input.getInt();
 		}
 	}
+	public int countTunnelMap(int[][] map) { // returns how many walls we have
+		int count = 0;
+		for(int i = 0; i < this.width; i++) {
+			for(int j = 0; j < this.height; j++) {
+				if(map[i][j] == 1) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
 	public int[][] getTunnelView(Player me){
 		int[][] map = new int[this.width][this.height];
 		for(int i = 0; i < this.width; i++){

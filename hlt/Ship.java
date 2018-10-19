@@ -8,6 +8,7 @@ public class Ship extends Entity{
 	public boolean shouldDeposit;
 	public final int minHalite = 900;
 	public String logString;
+	public Position mineGoal;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
 		super(owner, id, position);
 		this.halite = halite;
@@ -15,6 +16,7 @@ public class Ship extends Entity{
 		this.shouldDeposit = false;
 		this.turnsStill = 0;
 		logString = "";
+		mineGoal = null;
 	}
 	public boolean isFull(){
 		return halite >= Constants.MAX_HALITE;
@@ -59,9 +61,10 @@ public class Ship extends Entity{
 			return this.move(this.aStar(gameMap, me.shipyard.position), gameMap);
 		}
 		// If there is significant Halite underneath me, I should mine
-		if(gameMap.at(this).halite >= Constants.MAX_HALITE / 10 && !this.isFull()){
+		if((gameMap.at(this).halite >= Constants.MAX_HALITE / 10 || gameMap.at(this).halite >= gameMap.minHaliteWall) && !this.isFull()){
 			this.logString += "KEEP MINING. ";
 			me.tunnelMap[this.getX()][this.getY()] = 2;
+			this.mineGoal = null; // I reached the goal so reset
 			return this.stayStill();
 		}
 		// I should find out if I should deposit
@@ -77,22 +80,24 @@ public class Ship extends Entity{
 			return this.move(toMove, gameMap);
 		}
 		// Otherwise, I should find something to mine
-		this.logString += "FIND TO MINE. ";
-		int[][] tunnelMap = me.tunnelMap;
-		Position goal = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
-		double closest = 1000;
-		for(int i = 0; i < gameMap.width; i++){
-			for(int j = 0; j < gameMap.height; j++){
-				if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest && gameMap.at(i, j).canMoveOn()){
-					closest = this.position.distanceTo(new Position(i, j));
-					goal = new Position(i, j);
+		if(this.mineGoal == null) {
+			this.logString += "FIND TO MINE. ";
+			int[][] tunnelMap = me.tunnelMap;
+			this.mineGoal = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
+			double closest = 1000;
+			for(int i = 0; i < gameMap.width; i++){
+				for(int j = 0; j < gameMap.height; j++){
+					if(tunnelMap[i][j] == 1 && this.position.distanceTo(new Position(i, j)) < closest && gameMap.at(i, j).canMoveOn()){
+						closest = this.position.distanceTo(new Position(i, j));
+						this.mineGoal = new Position(i, j);
+					}
 				}
 			}
 		}
-		this.logString += " GOAL MINE IS AT " + goal.toString() + ". ";
-		me.tunnelMap[goal.x][goal.y] = 2;
-		//return this.move(gameMap.naiveNavigate(this, goal), gameMap);
-		return this.move(this.aStar(gameMap, goal), gameMap);
+		this.logString += " GOAL MINE IS AT " + this.mineGoal.toString() + ". ";
+		me.tunnelMap[this.mineGoal.x][this.mineGoal.y] = 2;
+		return this.move(this.aStar(gameMap, this.mineGoal), gameMap);
+		
 	}
 	public Direction aStar(GameMap gameMap, Position goal) {
 		AStarNode[][] map = new AStarNode[gameMap.width][gameMap.height];
@@ -101,7 +106,7 @@ public class Ship extends Entity{
 			for(int j = 0; j < map[i].length; j++) {
 				map[i][j] = new AStarNode(i, j);
 				// TODO ADD IN WRAPPING LOGIC
-				map[i][j].distFrom = (Math.abs(goal.x - i) + Math.abs(goal.y - j)) * 2;
+				map[i][j].distFrom = (Math.abs(goal.x - i) + Math.abs(goal.y - j)) * 2 + gameMap.at(goal).getFactorOfHundred();
 			}
 		}
 		ArrayList<AStarNode> open = new ArrayList<AStarNode>();
@@ -124,7 +129,7 @@ public class Ship extends Entity{
 			}
 			ArrayList<AStarNode> ns = lowest.neighbors(map);
 			for(AStarNode nbr : ns){
-				if(closed.contains(nbr) || gameMap.at(nbr.x, nbr.y).isOccupied()){
+				if(closed.contains(nbr) || (gameMap.at(nbr.x, nbr.y).isOccupied() && this.position.distanceTo(nbr) < 2)){
 					continue;
 				}
 				int possibleDistanceScore = lowest.distTraveled + 1;
