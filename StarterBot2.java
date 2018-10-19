@@ -18,7 +18,7 @@ public class StarterBot2{
 		// This is a good place to do computationally expensive start-up pre-processing.
 		// As soon as you call "ready" function below, the 2 second per turn timer will
 		// start.
-		game.ready("StarterBot");
+		game.ready("MyJavaBot");
 		Log.log("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
 		for(;;){
 			game.updateFrame();
@@ -27,8 +27,8 @@ public class StarterBot2{
 			final ArrayList<Command> commandQueue = new ArrayList<>();
 			for(final Ship ship : me.ships.values()){
 				if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
-					final Position randomPosition = new Position(rng.nextInt(gameMap.width), rng.nextInt(gameMap.height));
-					commandQueue.add(ship.move(ship.aStar(gameMap, randomPosition), gameMap));
+					final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
+					commandQueue.add(ship.move(randomDirection));
 				}else{
 					commandQueue.add(ship.stayStill());
 				}

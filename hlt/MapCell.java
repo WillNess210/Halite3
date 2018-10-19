@@ -15,9 +15,6 @@ public class MapCell {
         return ship == null && structure == null;
     }
 
-    public boolean canMoveOn() {
-    	return ship == null;
-    }
     public boolean isOccupied() {
         return ship != null;
     }
@@ -25,9 +22,7 @@ public class MapCell {
     public boolean hasStructure() {
         return structure != null;
     }
-    public int getFactorOfHundred() {
-    	return (int)this.halite/100;
-    }
+
     public void markUnsafe(final Ship ship) {
         this.ship = ship;
     }

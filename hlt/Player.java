@@ -1,16 +1,15 @@
 package hlt;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Player {
     public final PlayerId id;
-    public Shipyard shipyard;
+    public final Shipyard shipyard;
     public int halite;
-    public Map<EntityId, Ship> ships = new LinkedHashMap<>();
-    public Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
-    public int[][] tunnelMap;
+    public final Map<EntityId, Ship> ships = new LinkedHashMap<>();
+    public final Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
+
     private Player(final PlayerId id, final Shipyard shipyard) {
         this.id = id;
         this.shipyard = shipyard;
@@ -18,32 +17,13 @@ public class Player {
 
     void _update(final int numShips, final int numDropoffs, final int halite) {
         this.halite = halite;
-        ArrayList<EntityId> onlyAllowedIDs = new ArrayList<EntityId>();
+
+        ships.clear();
         for (int i = 0; i < numShips; ++i) {
-            Ship generatedShip = Ship._generate(id);
-            if(ships.containsKey(generatedShip.id)) {
-            	ships.get(generatedShip.id).halite = generatedShip.halite;
-            	if(ships.get(generatedShip.id).position.equals(generatedShip.position)) {
-            		ships.get(generatedShip.id).turnsStill++;
-            	}else {
-            		ships.get(generatedShip.id).turnsStill = 0;
-            	}
-            	ships.get(generatedShip.id).position.x = generatedShip.position.x;
-            	ships.get(generatedShip.id).position.y = generatedShip.position.y;
-            }else {
-                ships.put(generatedShip.id, generatedShip);
-            }
-            onlyAllowedIDs.add(generatedShip.id);
+            final Ship ship = Ship._generate(id);
+            ships.put(ship.id, ship);
         }
-        ArrayList<EntityId> toRemove = new ArrayList<EntityId>();
-        for(EntityId id : ships.keySet()) {
-        	if(!onlyAllowedIDs.contains(id)) {
-        		toRemove.add(id);
-        	}
-        }
-        for(EntityId id : toRemove) {
-        	ships.remove(id);
-        }
+
         dropoffs.clear();
         for (int i = 0; i < numDropoffs; ++i) {
             final Dropoff dropoff = Dropoff._generate(id);

@@ -1,4 +1,4 @@
-cd C:\Users\WillN\Documents\College\CompetitiveProgramming\Halite3\Halite3_Java_Windows-x86
+cd C:\Users\WillN\Documents\College\CompetitiveProgramming\Halite3\Halite3Round2
 call run_clean.bat
 javac MyBot.java
 javac StarterBot2.java

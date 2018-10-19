@@ -22,18 +22,7 @@ public class Entity {
         if (!id.equals(entity.id)) return false;
         return position.equals(entity.position);
     }
-    public void setX(int x) {
-    	this.position.x = x;
-    }
-    public int getX() {
-    	return this.position.x;
-    }
-    public void setY(int y) {
-    	this.position.y = y;
-    }
-    public int getY() {
-    	return this.position.y;
-    }
+
     @Override
     public int hashCode() {
         int result = owner.hashCode();
