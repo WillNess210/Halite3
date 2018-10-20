@@ -56,8 +56,17 @@ public class Log{
 	public static void addSpace() {
 		log(" ");
 	}
+	public static void logVar(final String title, final String var) {
+		storedMessage += "(" + title + ": " + var + ") ";
+	}
+	public static void logVarln(final String title, final String var) {
+		logVar(title, var);
+	}
 	public static void log(final String message) {
 		storedMessage += message + " ";
+	}
+	public static void logln() {
+		logln("");
 	}
 	public static void logln(final String message){
 		log(message);
