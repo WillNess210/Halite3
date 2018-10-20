@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class Log{
 		log(" ");
 	}
 	public static void log(final String message) {
-		storedMessage += message;
+		storedMessage += message + " ";
 	}
 	public static void logln(final String message){
 		log(message);

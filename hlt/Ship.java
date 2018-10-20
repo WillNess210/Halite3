@@ -1,23 +1,31 @@
-package hlt2;
+package hlt;
 import java.util.Random;
 
 public class Ship extends Entity{
-	public int halite, turnsAlive;
+	public int halite, turnsAlive, turnsStill;
+	public boolean shouldGoDeposit;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
 		super(owner, id, position);
 		this.halite = halite;
 		this.turnsAlive = 0;
+		this.turnsStill = 0;
+		this.shouldGoDeposit = false;
 	}
 	public Command getTurn(Game game, GameMap gameMap, Player me){
-		if(gameMap.at(this).halite > 10 && !this.isFull()){
+		// CHECK IF STUCK
+		if(this.turnsStill > 5){
+			Random rng = new Random();
+			return this.move(Direction.ALL_CARDINALS.get(rng.nextInt(Direction.ALL_CARDINALS.size())), gameMap);
+		}
+		if(gameMap.at(this).halite > 10 && !this.isFull()){ // KEEP MINING
 			return this.stayStill();
-		}else if(this.isFull()){
+		}else if(this.isFull() || this.shouldGoDeposit){ // MOVE BACK TO HOME
+			this.shouldGoDeposit = true;
 			Direction d = gameMap.naiveNavigate(this, me.shipyard.position);
 			return this.move(d, gameMap);
-		}else{
-			Random rng = new Random();
-			final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
-			return this.move(randomDirection, gameMap);
+		}else{ // FIND SOMEWHERE TO MINE
+			Position closestWall = gameMap.getClosestToTunnelMapWall(this);
+			return this.move(gameMap.naiveNavigate(this, closestWall), gameMap);
 		}
 	}
 	public boolean isFull(){
@@ -32,26 +40,30 @@ public class Ship extends Entity{
 			gameMap.at(this).markSafe();
 			this.position = this.position.directionalOffset(direction);
 			gameMap.at(this).markUnsafe(this);
+			this.turnsStill = 0;
 			return Command.move(id, direction);
 		}else{
-			return Command.move(id, Direction.STILL);
+			return this.stayStill();
 		}
 	}
 	public Command stayStill(){
+		this.turnsStill++;
 		return Command.move(id, Direction.STILL);
 	}
-	public void _update(int x, int y, int halite){
+	public void _update(Player me, int x, int y, int halite){
 		this.position.x = x;
 		this.position.y = y;
 		this.halite = halite;
 		this.turnsAlive++;
+		if(this.position.samePosition(me.shipyard.position)){
+			this.shouldGoDeposit = false;
+		}
 	}
 	public void log(){
 		this.id.logEntityId();
-		Log.addSpace();
 		this.position.log();
-		Log.log(": ");
-		Log.logln("(h: " + this.halite + " " + this.isFull() + ")");
+		Log.log(":");
+		Log.logln("(h: " + this.halite + ")");
 	}
 	static Ship _generate(final PlayerId playerId){
 		final Input input = Input.readInput();

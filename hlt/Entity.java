@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 
 public class Entity {
     public final PlayerId owner;

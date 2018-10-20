@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 
 import java.util.ArrayList;
 import java.util.HashMap;

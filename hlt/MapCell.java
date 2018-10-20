@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 public class MapCell{
 	public final Position position;
 	public int halite;

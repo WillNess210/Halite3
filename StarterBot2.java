@@ -1,5 +1,5 @@
 import java.util.Random;
-import hlt2.*;
+import hlt.*;
 
 public class StarterBot2{
 	public static void main(final String[] args){

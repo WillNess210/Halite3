@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 import java.util.ArrayList;
 
 public class Game{

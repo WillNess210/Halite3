@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,11 +13,26 @@ public class Player{
 		this.id = id;
 		this.shipyard = shipyard;
 	}
-	public void runTurn(Game game, GameMap gameMap) {
+	public void runTurn(Game game){
+		// gameMap
+		GameMap gameMap = game.gameMap;
+		// LOG HOW MANY TURTLES WE HAVE
+		Log.logln("NumTurtles: " + ships.size());
+		// FIND A GOOD MINIMUM HALITE WALL VALUE
+		int minHaliteWall = 0;
+		do{
+			minHaliteWall += 25;
+			gameMap.fillTunnelMap(this, minHaliteWall);
+		}while(gameMap.numWalls < ships.size() && minHaliteWall < 1000);
+		Log.logln("NumWalls: " + gameMap.numWalls);
+		Log.logln("MinHaliteWall: " + minHaliteWall);
+		gameMap.logTunnelMap(this);
+		// DETERMINE A MOVE FOR EACH SHIP
 		for(final Ship ship : ships.values()){
-			CommandQueue.add(ship.getTurn(game, gameMap, this));
 			ship.log();
+			CommandQueue.add(ship.getTurn(game, gameMap, this));
 		}
+		// DETERMINE IF WE SHOULD SPAWN
 		if(game.turnNumber <= 200 && this.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
 			CommandQueue.add(shipyard.spawn());
 		}
@@ -30,7 +45,7 @@ public class Player{
 		for(int i = 0; i < numShips; ++i){
 			final Ship generatedShip = Ship._generate(id);
 			if(ships.keySet().contains(generatedShip.id)){
-				ships.get(generatedShip.id)._update(generatedShip.position.x, generatedShip.position.y,
+				ships.get(generatedShip.id)._update(this, generatedShip.position.x, generatedShip.position.y,
 						generatedShip.halite);
 			}else{
 				ships.put(generatedShip.id, generatedShip);

@@ -1,10 +1,12 @@
-package hlt2;
+package hlt;
 import java.util.ArrayList;
 
 public class GameMap{
 	public final int width;
 	public final int height;
-	public final MapCell[][] cells;
+	public int[][] wallMap;
+	public int numWalls;
+	public MapCell[][] cells;
 	public GameMap(final int width, final int height){
 		this.width = width;
 		this.height = height;
@@ -12,6 +14,13 @@ public class GameMap{
 		for(int y = 0; y < height; ++y){
 			cells[y] = new MapCell[width];
 		}
+		wallMap = new int[width][height];
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j < height; j++){
+				wallMap[i][j] = -1;
+			}
+		}
+		numWalls = 0;
 	}
 	public MapCell at(final Position position){
 		final Position normalized = normalize(position);
@@ -19,6 +28,63 @@ public class GameMap{
 	}
 	public MapCell at(final Entity entity){
 		return at(entity.position);
+	}
+	public MapCell at(final int x, final int y){
+		return cells[y][x];
+	}
+	public void fillTunnelMap(Player me, int minHaliteWall){
+		// reset tunnel map
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j < height; j++){
+				wallMap[i][j] = -1;
+			}
+		}
+		numWalls = 0;
+		// call recursive functions
+		this.tunnelRecursiveHelper(me.shipyard.position, minHaliteWall);
+	}
+	public void tunnelRecursiveHelper(Position root, int minHaliteWall){
+		if(this.at(root).halite < minHaliteWall){
+			wallMap[root.x][root.y] = 0;
+			for(Position nbr : root.getNeighbours(this)){
+				if(wallMap[nbr.x][nbr.y] == -1){
+					this.tunnelRecursiveHelper(nbr, minHaliteWall);
+				}
+			}
+		}else{
+			wallMap[root.x][root.y] = 1;
+			this.numWalls++;
+		}
+	}
+	public void logTunnelMap(Player me){
+		for(int j = 0; j < height; j++){
+			for(int i = 0; i < width; i++){
+				if(me.shipyard.position.x == i && me.shipyard.position.y == j){
+					Log.log("*");
+				}else if(wallMap[i][j] == -1){
+					Log.log(" ");
+				}else{
+					Log.log(wallMap[i][j] + "");
+				}
+			}
+			Log.logln("");
+		}
+	}
+	public Position getClosestToTunnelMapWall(Ship s){
+		Position closest = new Position(1000, 1000);
+		for(int i = 0; i < this.width; i++){
+			for(int j = 0; j < this.height; j++){
+				if(wallMap[i][j] == 1 && s.position.distanceTo(new Position(i, j)) < s.position.distanceTo(closest)){
+					closest = new Position(i, j);
+				}
+			}
+		}
+		if(closest.x == 1000) {
+			return null;
+		}else {
+			wallMap[closest.x][closest.y] = 2;
+			return closest;
+		}
 	}
 	public int calculateDistance(final Position source, final Position target){
 		final Position normalizedSource = normalize(source);

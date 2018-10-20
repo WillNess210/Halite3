@@ -1,4 +1,4 @@
-import hlt2.*;
+import hlt.*;
 
 public class MyBot{
 	public static void main(final String[] args){
@@ -15,7 +15,7 @@ public class MyBot{
 			game.updateFrame();
 			CommandQueue.clear();
 			final Player me = game.me;
-			me.runTurn(game, game.gameMap);
+			me.runTurn(game);
 			game.endTurn();
 			Log.logln("");
 		}

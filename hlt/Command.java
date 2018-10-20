@@ -1,4 +1,4 @@
-package hlt2;
+package hlt;
 public class Command{
 	public final String command;
 	public static Command spawnShip(){
