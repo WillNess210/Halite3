@@ -57,18 +57,51 @@ public class GameMap{
 		}
 	}
 	public void logTunnelMap(Player me){
+		int minX = -1, maxX = -1, minY = -1, maxY = -1;
+		// determining min & max x
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j < height; j++){
+				if(wallMap[i][j] >= 0){
+					maxX = i;
+					if(minX == -1){
+						minX = i;
+					}
+					continue;
+				}
+			}
+		}
 		for(int j = 0; j < height; j++){
 			for(int i = 0; i < width; i++){
+				if(wallMap[i][j] >= 0){
+					maxY = j;
+					if(minY == -1){
+						minY = j;
+					}
+					continue;
+				}
+			}
+		}
+		Log.logln();
+		Log.logln("-- TUNNEL MAP --");
+		for(int j = minY; j <= maxY; j++){
+			for(int i = minX; i <= maxX; i++){
 				if(me.shipyard.position.x == i && me.shipyard.position.y == j){
-					Log.log("*");
+					Log.log("* ");
 				}else if(wallMap[i][j] == -1){
-					Log.log(" ");
+					Log.log("  ");
+				}else if(wallMap[i][j] == 0){
+					Log.log(". ");
+				}else if(wallMap[i][j] == 1){
+					Log.log("[]");
+				}else if(wallMap[i][j] - 100 >= 10){
+					Log.log((wallMap[i][j] - 100) + "");
 				}else{
-					Log.log(wallMap[i][j] + "");
+					Log.log((wallMap[i][j] - 100) + " ");
 				}
 			}
 			Log.logln("");
 		}
+		Log.logln("----------------");
 	}
 	public Position getClosestToTunnelMapWall(Ship s){
 		Position closest = new Position(1000, 1000);
@@ -79,10 +112,10 @@ public class GameMap{
 				}
 			}
 		}
-		if(closest.x == 1000) {
+		if(closest.x == 1000){
 			return null;
-		}else {
-			wallMap[closest.x][closest.y] = 2;
+		}else{
+			wallMap[closest.x][closest.y] = 100 + s.id.id;
 			return closest;
 		}
 	}

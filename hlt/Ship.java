@@ -11,17 +11,17 @@ public class Ship extends Entity{
 		this.turnsStill = 0;
 		this.shouldGoDeposit = false;
 	}
-	public Command getTurn(Game game, GameMap gameMap, Player me){
+	public Command getTurn(Game game, GameMap gameMap, Player me, int minHaliteToMine){
 		// CHECK IF STUCK
 		if(this.turnsStill > 5){
 			Log.log("STUCK");
 			Random rng = new Random();
 			return this.move(Direction.ALL_CARDINALS.get(rng.nextInt(Direction.ALL_CARDINALS.size())), gameMap);
 		}
-		if(gameMap.at(this).halite > 10 && !this.isFull()){ // KEEP MINING
+		if(gameMap.at(this).halite >= minHaliteToMine && !this.isFull()){ // KEEP MINING
 			Log.logVar("INTENT", "KEEP MINING");
 			this.turnsStill = 0;
-			gameMap.wallMap[this.position.x][this.position.y] = 2;
+			gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
 			return this.stayStill();
 		}else if(this.isFull() || this.shouldGoDeposit){ // MOVE BACK TO HOME
 			Log.logVar("INTENT", "MOVE TO DEPOSIT");

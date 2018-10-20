@@ -17,25 +17,26 @@ public class Player{
 		// gameMap
 		GameMap gameMap = game.gameMap;
 		// LOG HOW MANY TURTLES WE HAVE
-		Log.logln("NumTurtles: " + ships.size());
+		Log.logVar("NumTurtles", ships.size() + "");
 		// FIND A GOOD MINIMUM HALITE WALL VALUE
 		int minHaliteWall = 0;
 		do{
 			minHaliteWall += 25;
 			gameMap.fillTunnelMap(this, minHaliteWall);
 		}while(gameMap.numWalls < ships.size() && minHaliteWall < 1000);
-		Log.logln("NumWalls: " + gameMap.numWalls);
-		Log.logln("MinHaliteWall: " + minHaliteWall);
-		gameMap.logTunnelMap(this);
+		Log.logVar("NumWalls", gameMap.numWalls + "");
+		Log.logVarln("MinHaliteWall", minHaliteWall + "");
 		// DETERMINE A MOVE FOR EACH SHIP
 		for(final Ship ship : ships.values()){
 			ship.log();
-			CommandQueue.add(ship.getTurn(game, gameMap, this));
+			CommandQueue.add(ship.getTurn(game, gameMap, this, minHaliteWall));
 			Log.logln();
 		}
+		gameMap.logTunnelMap(this);
 		// DETERMINE IF WE SHOULD SPAWN
 		if(game.turnNumber <= 200 && this.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
 			CommandQueue.add(shipyard.spawn());
+			Log.logln("SPAWNING");
 		}
 	}
 	void _update(final int numShips, final int numDropoffs, final int halite){
