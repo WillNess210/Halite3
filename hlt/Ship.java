@@ -14,17 +14,25 @@ public class Ship extends Entity{
 	public Command getTurn(Game game, GameMap gameMap, Player me){
 		// CHECK IF STUCK
 		if(this.turnsStill > 5){
+			Log.log("STUCK");
 			Random rng = new Random();
 			return this.move(Direction.ALL_CARDINALS.get(rng.nextInt(Direction.ALL_CARDINALS.size())), gameMap);
 		}
 		if(gameMap.at(this).halite > 10 && !this.isFull()){ // KEEP MINING
+			Log.logVar("INTENT", "KEEP MINING");
+			this.turnsStill = 0;
+			gameMap.wallMap[this.position.x][this.position.y] = 2;
 			return this.stayStill();
 		}else if(this.isFull() || this.shouldGoDeposit){ // MOVE BACK TO HOME
+			Log.logVar("INTENT", "MOVE TO DEPOSIT");
+			Log.logVar("GOAL", me.shipyard.position.toString());
 			this.shouldGoDeposit = true;
 			Direction d = gameMap.naiveNavigate(this, me.shipyard.position);
 			return this.move(d, gameMap);
 		}else{ // FIND SOMEWHERE TO MINE
+			Log.logVar("INTENT", "FIND TO MINE");
 			Position closestWall = gameMap.getClosestToTunnelMapWall(this);
+			Log.logVar("GOAL", closestWall.toString());
 			return this.move(gameMap.naiveNavigate(this, closestWall), gameMap);
 		}
 	}
@@ -60,10 +68,9 @@ public class Ship extends Entity{
 		}
 	}
 	public void log(){
-		this.id.logEntityId();
-		this.position.log();
-		Log.log(":");
-		Log.logln("(h: " + this.halite + ")");
+		Log.logVar("ID", this.id.id + "");
+		Log.logVar("Pos", this.position.toString());
+		Log.logVar("Halite", this.halite + "");
 	}
 	static Ship _generate(final PlayerId playerId){
 		final Input input = Input.readInput();

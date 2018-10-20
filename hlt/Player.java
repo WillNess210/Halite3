@@ -31,6 +31,7 @@ public class Player{
 		for(final Ship ship : ships.values()){
 			ship.log();
 			CommandQueue.add(ship.getTurn(game, gameMap, this));
+			Log.logln();
 		}
 		// DETERMINE IF WE SHOULD SPAWN
 		if(game.turnNumber <= 200 && this.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
