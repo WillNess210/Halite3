@@ -39,6 +39,10 @@ public class Ship extends Entity{
 	public Command getTurnFindMine(Player me, GameMap gameMap){
 		Log.logVar("INTENT", "FIND TO MINE");
 		Position closestWall = gameMap.getOptimizedPointToTunnelMapWall(me, this);
+		if(closestWall == null) {
+			Log.log("CAN'T FIND ANYTHING");
+			return this.getTurnRandomMove(me, gameMap);
+		}
 		this.mineSpot = closestWall;
 		Log.logVar("MINE SPOT", this.mineSpot.toString());
 		Log.logVar("GOAL", closestWall.toString());
