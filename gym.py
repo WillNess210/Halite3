@@ -28,7 +28,7 @@ class Gym():
         self.stats = {'Wins': {}, 'Halite': {}}
 
     def run_game(self):
-        process_command = './halite --results-as-json'
+        process_command = 'halite.exe --results-as-json'
         if not self.enable_replays:
             process_command += ' --no-replay'
         else:
