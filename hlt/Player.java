@@ -9,6 +9,7 @@ public class Player{
 	public int halite;
 	public Map<EntityId, Ship> ships = new LinkedHashMap<>();
 	public Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
+	public Map<Integer, Ship> shipyardPlanner = new LinkedHashMap<>();
 	private Player(final PlayerId id, final Shipyard shipyard){
 		this.id = id;
 		this.shipyard = shipyard;
@@ -29,12 +30,27 @@ public class Player{
 		// DETERMINE A MOVE FOR EACH SHIP
 		for(final Ship ship : ships.values()){
 			ship.log();
-			CommandQueue.add(ship.getTurn(game, gameMap, this, minHaliteWall));
+			int turnsHome = ship.position.distanceTo(this.shipyard.position);
+			if(ship.turnsStill > 5){  // CHECK IF STUCK
+				CommandQueue.add(ship.getTurnRandomMove(this, gameMap));
+			}else if((ship.halite > 800 && !shipyardPlanner.containsKey(turnsHome)) || ship.shouldGoDeposit){ // CHECK IF I SHOULD GO DEPOSIT
+				ship.shouldGoDeposit = true;
+				shipyardPlanner.put(turnsHome, ship);
+				CommandQueue.add(ship.getTurnDeposit(this, gameMap));
+			}else if(gameMap.at(ship).halite >= minHaliteWall && !ship.isFull()){ // CHECK IF SHOULD KEEP MINING
+				CommandQueue.add(ship.getTurnMine(this, gameMap));
+			}else if(ship.isFull()){ // Can't do anything :( TODO implement this as a system to create more dropoffs
+				CommandQueue.add(ship.getTurnMine(this, gameMap));
+			}else{ // OTHERWISE FIND SOMEWHERE TO MINE
+				CommandQueue.add(ship.getTurnFindMine(this, gameMap));
+			}
 			Log.logln();
 		}
 		gameMap.logTunnelMap(this);
+		this.logShipyardPlanner();
 		// DETERMINE IF WE SHOULD SPAWN
-		if(game.turnNumber <= 200 && this.halite >= Constants.SHIP_COST && !gameMap.at(shipyard).isOccupied()){
+		if(game.turnNumber <= (3 * game.getNumTurns()) / 4 && this.halite >= Constants.SHIP_COST
+				&& !gameMap.at(shipyard).isOccupied()){
 			CommandQueue.add(shipyard.spawn());
 			Log.logln("SPAWNING");
 		}
@@ -62,6 +78,12 @@ public class Player{
 		for(int i = 0; i < numDropoffs; ++i){
 			final Dropoff dropoff = Dropoff._generate(id);
 			dropoffs.put(dropoff.id, dropoff);
+		}
+		shipyardPlanner.clear();
+	}
+	public void logShipyardPlanner(){
+		for(int key : shipyardPlanner.keySet()){
+			Log.logln(key + ": " + shipyardPlanner.get(key).id.id);
 		}
 	}
 	static Player _generate(){

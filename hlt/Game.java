@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 public class Game{
 	public int turnNumber;
+	private int numTurns;
 	public final PlayerId myId;
 	public ArrayList<Player> players = new ArrayList<>();
 	public Player me;
@@ -18,6 +19,7 @@ public class Game{
 		}
 		me = players.get(myId.id);
 		gameMap = GameMap._generate();
+		numTurns = 401 + (gameMap.width - 32) * (100 / 32);
 	}
 	public void ready(final String name){
 		System.out.println(name);
@@ -43,6 +45,9 @@ public class Game{
 				gameMap.at(dropoff).structure = dropoff;
 			}
 		}
+	}
+	public int getNumTurns(){
+		return this.numTurns;
 	}
 	public void endTurn(){
 		for(final Command command : CommandQueue.commandQueue){

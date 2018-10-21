@@ -1,4 +1,5 @@
 package hlt;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Ship extends Entity{
@@ -11,30 +12,39 @@ public class Ship extends Entity{
 		this.turnsStill = 0;
 		this.shouldGoDeposit = false;
 	}
-	public Command getTurn(Game game, GameMap gameMap, Player me, int minHaliteToMine){
-		// CHECK IF STUCK
-		if(this.turnsStill > 5){
-			Log.log("STUCK");
-			Random rng = new Random();
-			return this.move(Direction.ALL_CARDINALS.get(rng.nextInt(Direction.ALL_CARDINALS.size())), gameMap);
-		}
-		if(gameMap.at(this).halite >= minHaliteToMine && !this.isFull()){ // KEEP MINING
-			Log.logVar("INTENT", "KEEP MINING");
-			this.turnsStill = 0;
-			gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
+	public Command getTurnDeposit(Player me, GameMap gameMap){
+		Log.logVar("INTENT", "MOVE TO DEPOSIT");
+		Log.logVar("GOAL", me.shipyard.position.toString());
+		this.shouldGoDeposit = true;
+		Direction d = gameMap.naiveNavigate(this, me.shipyard.position);
+		return this.move(d, gameMap);
+	}
+	public Command getTurnFindMine(Player me, GameMap gameMap){
+		Log.logVar("INTENT", "FIND TO MINE");
+		Position closestWall = gameMap.getOptimizedPointToTunnelMapWall(me, this);
+		Log.logVar("GOAL", closestWall.toString());
+		return this.move(AStar.aStar(this, gameMap, closestWall), gameMap);
+		//return this.move(gameMap.naiveNavigate(this, closestWall), gameMap);
+	}
+	public Command getTurnMine(Player me, GameMap gameMap){
+		Log.logVar("INTENT", "KEEP MINING");
+		this.turnsStill = -1;
+		gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
+		return this.stayStill();
+	}
+	public Command getTurnStill(Player me, GameMap gameMap){
+		Log.logVar("INTENT", "IDLE");
+		this.turnsStill = -1;
+		return this.stayStill();
+	}
+	public Command getTurnRandomMove(Player me, GameMap gameMap){
+		Log.log("STUCK");
+		Random rng = new Random();
+		ArrayList<Position> ns = this.position.getEmptyNeighbours(gameMap);
+		if(ns.size() == 0){
 			return this.stayStill();
-		}else if(this.isFull() || this.shouldGoDeposit){ // MOVE BACK TO HOME
-			Log.logVar("INTENT", "MOVE TO DEPOSIT");
-			Log.logVar("GOAL", me.shipyard.position.toString());
-			this.shouldGoDeposit = true;
-			Direction d = gameMap.naiveNavigate(this, me.shipyard.position);
-			return this.move(d, gameMap);
-		}else{ // FIND SOMEWHERE TO MINE
-			Log.logVar("INTENT", "FIND TO MINE");
-			Position closestWall = gameMap.getClosestToTunnelMapWall(this);
-			Log.logVar("GOAL", closestWall.toString());
-			return this.move(gameMap.naiveNavigate(this, closestWall), gameMap);
 		}
+		return this.move(gameMap.naiveNavigate(this, ns.get(rng.nextInt(ns.size()))), gameMap);
 	}
 	public boolean isFull(){
 		return halite >= Constants.MAX_HALITE;

@@ -103,6 +103,29 @@ public class GameMap{
 		}
 		Log.logln("----------------");
 	}
+	public Position getOptimizedPointToTunnelMapWall(Player me, Ship s){
+		Position closest = new Position(1000, 1000);
+		double bestScore = 999999;
+		for(int i = 0; i < this.width; i++){
+			for(int j = 0; j < this.height; j++){
+				if(wallMap[i][j] == 1){
+					Position test = new Position(i, j);
+					double score = s.position.distanceTo(test) + 3 * me.shipyard.position.distanceTo(test)
+							- 1.5 * this.at(test).factorOfHundred();
+					if(score < bestScore){
+						closest = new Position(i, j);
+						bestScore = score;
+					}
+				}
+			}
+		}
+		if(closest.x == 1000){
+			return null;
+		}else{
+			wallMap[closest.x][closest.y] = 100 + s.id.id;
+			return closest;
+		}
+	}
 	public Position getClosestToTunnelMapWall(Ship s){
 		Position closest = new Position(1000, 1000);
 		for(int i = 0; i < this.width; i++){

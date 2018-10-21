@@ -61,6 +61,7 @@ public class Log{
 	}
 	public static void logVarln(final String title, final String var) {
 		logVar(title, var);
+		logln();
 	}
 	public static void log(final String message) {
 		storedMessage += message + " ";
