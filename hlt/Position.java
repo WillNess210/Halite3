@@ -13,8 +13,8 @@ public class Position{
 			return new Position(gameMap.width - 1, gameMap.height - 1);
 		}
 		Position highestHalite = nbrs.get(0);
-		for(Position pos : nbrs) {
-			if(gameMap.at(pos).halite > gameMap.at(highestHalite).halite) {
+		for(Position pos : nbrs){
+			if(gameMap.at(pos).halite > gameMap.at(highestHalite).halite){
 				highestHalite = pos;
 			}
 		}
@@ -78,35 +78,6 @@ public class Position{
 		}
 		return next;
 	}
-	Position directionalOffset(final Direction d){
-		final int dx;
-		final int dy;
-		switch(d){
-			case NORTH:
-				dx = 0;
-				dy = -1;
-				break;
-			case SOUTH:
-				dx = 0;
-				dy = 1;
-				break;
-			case EAST:
-				dx = 1;
-				dy = 0;
-				break;
-			case WEST:
-				dx = -1;
-				dy = 0;
-				break;
-			case STILL:
-				dx = 0;
-				dy = 0;
-				break;
-			default:
-				throw new IllegalStateException("Unknown direction " + d);
-		}
-		return new Position(x + dx, y + dy);
-	}
 	public void logln(){
 		Log.logln(this.toString());
 	}
@@ -116,8 +87,12 @@ public class Position{
 	public String toString(){
 		return "(" + this.x + ", " + this.y + ")";
 	}
-	public int distanceTo(Position b){
-		return Math.abs(b.x - this.x) + Math.abs(b.y - this.y);
+	public int distanceTo(Position b, GameMap gameMap){
+		int dx1 = b.x - this.x < 0 ? b.x - this.x + gameMap.width : b.x - this.x;
+		int dx2 = this.x - b.x < 0 ? this.x - b.x + gameMap.width : this.x - b.x;
+		int dy1 = b.y - this.y < 0 ? b.y - this.y + gameMap.height : b.y - this.y;
+		int dy2 = this.y - b.y < 0 ? this.y - b.y + gameMap.height : this.y - b.y;
+		return Math.min(dx1, dx2) + Math.min(dy1, dy2);
 	}
 	public boolean samePosition(Position b){
 		return this.x == b.x && this.y == b.y;

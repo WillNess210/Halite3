@@ -20,7 +20,7 @@ public class Ship extends Entity{
 		if(this.position.samePosition(me.shipyard.position)){
 			Log.log("READY TO BE HIT");
 			return this.stayStill();
-		}else if(this.position.distanceTo(me.shipyard.position) == 1){
+		}else if(this.position.distanceTo(me.shipyard.position, gameMap) == 1){
 			Direction d = gameMap.naiveNavigateSuicide(this, me.shipyard.position);
 			return this.moveSuicide(d, gameMap);
 		}else{
@@ -39,7 +39,7 @@ public class Ship extends Entity{
 	public Command getTurnFindMine(Player me, GameMap gameMap){
 		Log.logVar("INTENT", "FIND TO MINE");
 		Position closestWall = gameMap.getOptimizedPointToTunnelMapWall(me, this);
-		if(closestWall == null) {
+		if(closestWall == null){
 			Log.log("CAN'T FIND ANYTHING");
 			return this.getTurnRandomMove(me, gameMap);
 		}
@@ -88,7 +88,7 @@ public class Ship extends Entity{
 	public Command moveSuicide(final Direction direction, GameMap gameMap){
 		if(this.halite >= gameMap.at(this).halite / 10){
 			gameMap.at(this).markSafe();
-			this.position = this.position.directionalOffset(direction);
+			this.position = this.position.directionalOffset(direction, gameMap);
 			gameMap.at(this).markUnsafe(this);
 			this.turnsStill = 0;
 			return Command.move(id, direction);
@@ -98,9 +98,9 @@ public class Ship extends Entity{
 	}
 	public Command move(final Direction direction, GameMap gameMap, Player me){
 		if(this.halite >= gameMap.at(this).halite / 10
-				&& gameMap.at(this.position.directionalOffset(direction)).canMoveOn(me)){
+				&& gameMap.at(this.position.directionalOffset(direction, gameMap)).canMoveOn(me)){
 			gameMap.at(this).markSafe();
-			this.position = this.position.directionalOffset(direction);
+			this.position = this.position.directionalOffset(direction, gameMap);
 			gameMap.at(this).markUnsafe(this);
 			this.turnsStill = 0;
 			return Command.move(id, direction);

@@ -110,7 +110,7 @@ public class GameMap{
 			for(int j = 0; j < this.height; j++){
 				if(wallMap[i][j] == 1 && this.at(i, j).canMoveOn(me)){
 					Position test = new Position(i, j);
-					double score = s.position.distanceTo(test) + 3 * me.shipyard.position.distanceTo(test)
+					double score = s.position.distanceTo(test, this) + 3 * me.shipyard.position.distanceTo(test, this)
 							- 1.5 * this.at(test).factorOfHundred();
 					if(score < bestScore){
 						closest = new Position(i, j);
@@ -130,7 +130,7 @@ public class GameMap{
 		Position closest = new Position(1000, 1000);
 		for(int i = 0; i < this.width; i++){
 			for(int j = 0; j < this.height; j++){
-				if(wallMap[i][j] == 1 && s.position.distanceTo(new Position(i, j)) < s.position.distanceTo(closest)){
+				if(wallMap[i][j] == 1 && s.position.distanceTo(new Position(i, j), this) < s.position.distanceTo(closest, this)){
 					closest = new Position(i, j);
 				}
 			}
@@ -186,7 +186,7 @@ public class GameMap{
 	public Direction naiveNavigate(final Ship ship, final Position destination, Player me){
 		// getUnsafeMoves normalizes for us
 		for(final Direction direction : getUnsafeMoves(ship.position, destination)){
-			final Position targetPos = ship.position.directionalOffset(direction);
+			final Position targetPos = ship.position.directionalOffset(direction, this);
 			if(this.at(targetPos).canMoveOn(me)){
 				return direction;
 			}

@@ -61,6 +61,10 @@ public class Player{
 			CommandQueue.add(lowestShip.moveTowards(gameMap, highestHalite, this));
 			shipsSorted.remove(lowestShip);
 		}
+		// CHECK FOR CREATING DROPOFFS
+		if(game.turnNumber > 100 && game.turnNumber % 50 == 0) {
+			
+		}
 		// DETERMINE A MOVE FOR EACH SHIP
 		Log.logln();
 		for(final Ship ship : shipsSorted){
@@ -106,6 +110,7 @@ public class Player{
 			CommandQueue.add(shipyard.spawn());
 			Log.logln("SPAWNING");
 		}
+		Log.logVarln("SHIPYARD PLANNER SIZE", shipyardPlanner.size() + "");
 	}
 	void _update(final int numShips, final int numDropoffs, final int halite){
 		this.halite = halite;
