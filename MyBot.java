@@ -1,8 +1,8 @@
 import hlt.*;
 
 // TODO use ship planner to start dropoffs, choose wall closest to most Halite
-// TODO early game send bots back once their total halite >= 1000
 // TODO implement wrap-around
+// TODO implement edge-case handling for when my shipyard has a ship, and is completely surrounded by 4 ships
 
 public class MyBot{
 	public static void main(final String[] args){
