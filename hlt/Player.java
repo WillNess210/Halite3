@@ -56,8 +56,9 @@ public class Player{
 				}else{
 					CommandQueue.add(ship.getTurnSuicide(this, gameMap));
 				}
-			}else if((ship.halite > 800 && !shipyardPlanner.containsKey(ship.distanceToShipyard))
-					|| ship.shouldGoDeposit){ // CHECK IF I SHOULD GO DEPOSIT
+			}else if(((ship.halite > 800 || (ship.halite > 400 && ships.size() < 10))
+					&& !shipyardPlanner.containsKey(ship.distanceToShipyard))
+					&& gameMap.at(ship).halite >= minHaliteWall || ship.shouldGoDeposit){ // CHECK IF I SHOULD GO DEPOSIT
 				ship.shouldGoDeposit = true;
 				shipyardPlanner.put(ship.distanceToShipyard, ship);
 				CommandQueue.add(ship.getTurnDeposit(this, gameMap));
