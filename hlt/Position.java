@@ -7,6 +7,19 @@ public class Position{
 		this.x = x;
 		this.y = y;
 	}
+	Position getHighestHaliteEmptyNeighbour(Player me, GameMap gameMap){
+		ArrayList<Position> nbrs = this.getEmptyNeighbours(me, gameMap);
+		if(nbrs.size() == 0){
+			return new Position(gameMap.width - 1, gameMap.height - 1);
+		}
+		Position highestHalite = nbrs.get(0);
+		for(Position pos : nbrs) {
+			if(gameMap.at(pos).halite > gameMap.at(highestHalite).halite) {
+				highestHalite = pos;
+			}
+		}
+		return highestHalite;
+	}
 	ArrayList<Position> getEmptyNeighbours(Player me, GameMap gameMap){
 		ArrayList<Position> toReturn = new ArrayList<Position>();
 		Position[] ns = this.getNeighbours(gameMap);

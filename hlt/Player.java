@@ -45,6 +45,22 @@ public class Player{
 			}
 		}
 		shipsSorted.sort((o1, o2) -> o1.distanceToShipyard - o2.distanceToShipyard);
+		// CHECK FOR SURROUNDED SHIPYARD
+		if(this.shipyard.position.getEmptyNeighbours(this, gameMap).size() == 0){
+			Ship lowestShip = null;
+			for(Ship ship : ships.values()){
+				if(!ship.position.samePosition(this.shipyard.position)
+						&& (lowestShip == null || gameMap.at(ship).halite < gameMap.at(lowestShip).halite)){
+					lowestShip = ship;
+				}
+			}
+			Position highestHalite = lowestShip.position.getHighestHaliteEmptyNeighbour(this, gameMap);
+			Log.logln();
+			lowestShip.log();
+			Log.log("BYPASS");
+			CommandQueue.add(lowestShip.moveTowards(gameMap, highestHalite, this));
+			shipsSorted.remove(lowestShip);
+		}
 		// DETERMINE A MOVE FOR EACH SHIP
 		Log.logln();
 		for(final Ship ship : shipsSorted){
