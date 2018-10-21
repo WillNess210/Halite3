@@ -2,10 +2,11 @@ package hlt;
 import java.util.ArrayList;
 
 public class AStar{
-	public static Direction aStar(Ship s, GameMap gameMap, Position goal){
+	public static Direction aStar(Ship s, GameMap gameMap, Player me, Position goal){
 		if(s.position.distanceTo(goal) <= 1){ // if we're 1 away, don't bother with A*
 			Log.logVar("A*", "REROUTED TO NATIVE");
-			return gameMap.naiveNavigate(s, goal);
+			gameMap.at(goal).aDistTraveled = 0;
+			return gameMap.naiveNavigate(s, goal, me);
 		}
 		for(int j = 0; j < gameMap.height; j++){
 			for(int i = 0; i < gameMap.width; i++){
@@ -33,7 +34,7 @@ public class AStar{
 				break;
 			}
 			for(MapCell nbr : lowest.getNeighbours(gameMap)){
-				if(closed.contains(nbr) || (!nbr.canMoveOn() && s.position.distanceTo(nbr.position) < 2)){
+				if(closed.contains(nbr) || (!nbr.canMoveOn(me) && s.position.distanceTo(nbr.position) < 2)){
 					continue;
 				}
 				int distanceScore = lowest.aDistTraveled + 1;
@@ -54,7 +55,7 @@ public class AStar{
 				target = target.parent;
 			}
 			Log.logVar("A*", target.position.toString());
-			return gameMap.naiveNavigate(s, target.position);
+			return gameMap.naiveNavigate(s, target.position, me);
 		}
 	}
 }

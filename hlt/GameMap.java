@@ -183,11 +183,11 @@ public class GameMap{
 		}
 		return Direction.STILL;
 	}
-	public Direction naiveNavigate(final Ship ship, final Position destination){
+	public Direction naiveNavigate(final Ship ship, final Position destination, Player me){
 		// getUnsafeMoves normalizes for us
 		for(final Direction direction : getUnsafeMoves(ship.position, destination)){
 			final Position targetPos = ship.position.directionalOffset(direction);
-			if(this.at(targetPos).canMoveOn()){
+			if(this.at(targetPos).canMoveOn(me)){
 				return direction;
 			}
 		}

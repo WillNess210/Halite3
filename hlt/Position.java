@@ -7,11 +7,11 @@ public class Position{
 		this.x = x;
 		this.y = y;
 	}
-	ArrayList<Position> getEmptyNeighbours(GameMap gameMap){
+	ArrayList<Position> getEmptyNeighbours(Player me, GameMap gameMap){
 		ArrayList<Position> toReturn = new ArrayList<Position>();
 		Position[] ns = this.getNeighbours(gameMap);
 		for(Position n : ns){
-			if(gameMap.at(n).canMoveOn()){
+			if(gameMap.at(n).canMoveOn(me)){
 				toReturn.add(n);
 			}
 		}

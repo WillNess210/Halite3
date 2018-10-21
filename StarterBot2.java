@@ -21,7 +21,7 @@ public class StarterBot2{
 			for(final Ship ship : me.ships.values()){
 				if(gameMap.at(ship).halite < Constants.MAX_HALITE / 10 || ship.isFull()){
 					final Direction randomDirection = Direction.ALL_CARDINALS.get(rng.nextInt(4));
-					CommandQueue.add(ship.move(randomDirection, gameMap));
+					CommandQueue.add(ship.move(randomDirection, gameMap, me));
 				}else{
 					CommandQueue.add(ship.stayStill());
 				}

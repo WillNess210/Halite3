@@ -29,8 +29,8 @@ public class MapCell{
 	public boolean isEmpty(){
 		return ship == null && structure == null;
 	}
-	public boolean canMoveOn(){
-		return ship == null;
+	public boolean canMoveOn(Player me){
+		return ship == null || (me.shipyard.position.samePosition(this.position) && this.ship != null && this.ship.owner.id != me.id.id);
 	}
 	public boolean isOccupied(){
 		return ship != null;

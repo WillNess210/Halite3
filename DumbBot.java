@@ -1,7 +1,5 @@
-import hlt.CommandQueue;
 import hlt.Game;
 import hlt.Log;
-import hlt.Player;
 
 public class DumbBot{
 	public static void main(final String[] args){
