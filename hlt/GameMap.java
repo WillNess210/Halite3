@@ -108,7 +108,7 @@ public class GameMap{
 		double bestScore = 999999;
 		for(int i = 0; i < this.width; i++){
 			for(int j = 0; j < this.height; j++){
-				if(wallMap[i][j] == 1){
+				if(wallMap[i][j] == 1 && this.at(i, j).canMoveOn(me)){
 					Position test = new Position(i, j);
 					double score = s.position.distanceTo(test) + 3 * me.shipyard.position.distanceTo(test)
 							- 1.5 * this.at(test).factorOfHundred();

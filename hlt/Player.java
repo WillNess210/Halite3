@@ -7,12 +7,14 @@ public class Player{
 	public final PlayerId id;
 	public final Shipyard shipyard;
 	public int halite;
+	public boolean startSuicide;
 	public Map<EntityId, Ship> ships = new LinkedHashMap<>();
 	public Map<EntityId, Dropoff> dropoffs = new LinkedHashMap<>();
 	public Map<Integer, Ship> shipyardPlanner = new LinkedHashMap<>();
 	private Player(final PlayerId id, final Shipyard shipyard){
 		this.id = id;
 		this.shipyard = shipyard;
+		this.startSuicide = false;
 	}
 	public void runTurn(Game game){
 		// gameMap
@@ -49,7 +51,8 @@ public class Player{
 			ship.log();
 			if(ship.turnsStill > 5){ // CHECK IF STUCK
 				CommandQueue.add(ship.getTurnRandomMove(this, gameMap));
-			}else if(ship.distanceToShipyard + 10 > game.getNumTurnsLeft()){ // GO AND SUICIDE
+			}else if(this.startSuicide || ship.distanceToShipyard + 10 > game.getNumTurnsLeft()){ // GO AND SUICIDE
+				this.startSuicide = true;
 				if(ship.id.id == firstShipID.id){ // first ship needs to get out of the way
 					CommandQueue
 							.add(ship.moveTowards(gameMap, new Position(gameMap.width - 1, gameMap.height - 1), this));
@@ -58,13 +61,16 @@ public class Player{
 				}
 			}else if(((ship.halite > 800 || (ship.halite > 400 && ships.size() < 10))
 					&& !shipyardPlanner.containsKey(ship.distanceToShipyard))
-					&& gameMap.at(ship).halite >= minHaliteWall || ship.shouldGoDeposit){ // CHECK IF I SHOULD GO DEPOSIT
-				ship.shouldGoDeposit = true;
-				shipyardPlanner.put(ship.distanceToShipyard, ship);
-				CommandQueue.add(ship.getTurnDeposit(this, gameMap));
+					&& gameMap.at(ship).halite <= minHaliteWall || ship.shouldGoDeposit || ship.isFull()){ // CHECK IF I SHOULD GO DEPOSIT
+				if(ship.isFull() && shipyardPlanner.containsKey(ship.distanceToShipyard)){ // Can't do anything :( TODO implement this as a system to create more dropoffs
+					Log.log("COLLISION");
+					CommandQueue.add(ship.getTurnMine(this, gameMap));
+				}else{
+					ship.shouldGoDeposit = true;
+					shipyardPlanner.put(ship.distanceToShipyard, ship);
+					CommandQueue.add(ship.getTurnDeposit(this, gameMap));
+				}
 			}else if(gameMap.at(ship).halite >= minHaliteWall && !ship.isFull()){ // CHECK IF SHOULD KEEP MINING
-				CommandQueue.add(ship.getTurnMine(this, gameMap));
-			}else if(ship.isFull()){ // Can't do anything :( TODO implement this as a system to create more dropoffs
 				CommandQueue.add(ship.getTurnMine(this, gameMap));
 			}else{ // OTHERWISE FIND SOMEWHERE TO MINE
 				if(ship.mineSpot == null || !gameMap.at(ship.mineSpot).canMoveOn(this)){
@@ -73,6 +79,7 @@ public class Player{
 					CommandQueue.add(ship.moveTowardsMineSpot(gameMap, this));
 				}
 			}
+			Log.logVar("Command Given", CommandQueue.getLast());
 			Log.logln();
 		}
 		gameMap.logTunnelMap(this);

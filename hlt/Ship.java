@@ -17,7 +17,10 @@ public class Ship extends Entity{
 	}
 	public Command getTurnSuicide(Player me, GameMap gameMap){
 		Log.logVar("INTENT", "MOVE TO SUICIDE");
-		if(this.position.distanceTo(me.shipyard.position) == 1){
+		if(this.position.samePosition(me.shipyard.position)){
+			Log.log("READY TO BE HIT");
+			return this.stayStill();
+		}else if(this.position.distanceTo(me.shipyard.position) == 1){
 			Direction d = gameMap.naiveNavigateSuicide(this, me.shipyard.position);
 			return this.moveSuicide(d, gameMap);
 		}else{

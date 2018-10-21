@@ -10,4 +10,11 @@ public class CommandQueue{
 	public static void clear() {
 		commandQueue.clear();
 	}
+	public static String getLast() {
+		if(commandQueue.size() == 0) {
+			return "NO COMMANDS IN";
+		}else {
+			return commandQueue.get(commandQueue.size() - 1).command;
+		}
+	}
 }
