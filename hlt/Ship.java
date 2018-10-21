@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Ship extends Entity{
-	public int halite, turnsAlive, turnsStill, distanceToShipyard;
+	public int halite, turnsAlive, turnsStill, distanceToDropoff;
 	public boolean shouldGoDeposit;
 	public Position mineSpot;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
@@ -12,7 +12,7 @@ public class Ship extends Entity{
 		this.turnsAlive = 0;
 		this.turnsStill = 0;
 		this.shouldGoDeposit = false;
-		this.distanceToShipyard = 0;
+		this.distanceToDropoff = 0;
 		this.mineSpot = null;
 	}
 	public Command getTurnSuicide(Player me, GameMap gameMap){
@@ -111,6 +111,15 @@ public class Ship extends Entity{
 	public int getTurnsToAfter(GameMap gameMap, Position b){
 		return gameMap.at(b).aDistTraveled;
 	}
+	public Position getClosest(GameMap gameMap, ArrayList<Position> b) {
+		Position closest = b.get(0);
+		for(Position pos : b) {
+			if(pos.distanceTo(this.position, gameMap) < closest.distanceTo(this.position, gameMap)) {
+				closest = pos;
+			}
+		}
+		return  closest;
+	}
 	public int getTurnsTo(GameMap gameMap, Position b, Player me){
 		AStar.aStar(this, gameMap, me, b);
 		return this.getTurnsToAfter(gameMap, b);
@@ -132,7 +141,7 @@ public class Ship extends Entity{
 		Log.logVar("ID", this.id.id + "");
 		Log.logVar("Pos", this.position.toString());
 		Log.logVar("Halite", this.halite + "");
-		Log.logVar("Turns from Shipyard", this.distanceToShipyard + "");
+		Log.logVar("Turns from Dropoff", this.distanceToDropoff + "");
 	}
 	static Ship _generate(final PlayerId playerId){
 		final Input input = Input.readInput();

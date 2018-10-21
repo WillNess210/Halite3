@@ -35,16 +35,16 @@ public class Player{
 		for(Ship ship : ships.values()){
 			int turnsHome = ship.getTurnsTo(gameMap, this.shipyard.position, this);
 			if(turnsHome == 0 && ship.position.samePosition(this.shipyard.position)){
-				ship.distanceToShipyard = -1;
+				ship.distanceToDropoff = -1;
 			}else{
-				ship.distanceToShipyard = turnsHome;
+				ship.distanceToDropoff = turnsHome;
 			}
 			shipsSorted.add(ship);
 			if(firstShipID == null){
 				firstShipID = ship.id;
 			}
 		}
-		shipsSorted.sort((o1, o2) -> o1.distanceToShipyard - o2.distanceToShipyard);
+		shipsSorted.sort((o1, o2) -> o1.distanceToDropoff - o2.distanceToDropoff);
 		// CHECK FOR SURROUNDED SHIPYARD
 		if(this.shipyard.position.getEmptyNeighbours(this, gameMap).size() == 0){
 			Ship lowestShip = null;
@@ -62,8 +62,7 @@ public class Player{
 			shipsSorted.remove(lowestShip);
 		}
 		// CHECK FOR CREATING DROPOFFS
-		if(game.turnNumber > 100 && game.turnNumber % 50 == 0) {
-			
+		if(game.turnNumber > 100 && game.turnNumber % 50 == 0){
 		}
 		// DETERMINE A MOVE FOR EACH SHIP
 		Log.logln();
@@ -71,7 +70,7 @@ public class Player{
 			ship.log();
 			if(ship.turnsStill > 5){ // CHECK IF STUCK
 				CommandQueue.add(ship.getTurnRandomMove(this, gameMap));
-			}else if(this.startSuicide || ship.distanceToShipyard + 10 > game.getNumTurnsLeft()){ // GO AND SUICIDE
+			}else if(this.startSuicide || ship.distanceToDropoff + 10 > game.getNumTurnsLeft()){ // GO AND SUICIDE
 				this.startSuicide = true;
 				if(ship.id.id == firstShipID.id){ // first ship needs to get out of the way
 					CommandQueue
@@ -80,14 +79,14 @@ public class Player{
 					CommandQueue.add(ship.getTurnSuicide(this, gameMap));
 				}
 			}else if(((ship.halite > 800 || (ship.halite > 400 && ships.size() < 10))
-					&& !shipyardPlanner.containsKey(ship.distanceToShipyard))
+					&& !shipyardPlanner.containsKey(ship.distanceToDropoff))
 					&& gameMap.at(ship).halite <= minHaliteWall || ship.shouldGoDeposit || ship.isFull()){ // CHECK IF I SHOULD GO DEPOSIT
-				if(ship.isFull() && shipyardPlanner.containsKey(ship.distanceToShipyard)){ // Can't do anything :( TODO implement this as a system to create more dropoffs
+				if(ship.isFull() && shipyardPlanner.containsKey(ship.distanceToDropoff)){ // Can't do anything :( TODO implement this as a system to create more dropoffs
 					Log.log("COLLISION");
 					CommandQueue.add(ship.getTurnMine(this, gameMap));
 				}else{
 					ship.shouldGoDeposit = true;
-					shipyardPlanner.put(ship.distanceToShipyard, ship);
+					shipyardPlanner.put(ship.distanceToDropoff, ship);
 					CommandQueue.add(ship.getTurnDeposit(this, gameMap));
 				}
 			}else if(gameMap.at(ship).halite >= minHaliteWall && !ship.isFull()){ // CHECK IF SHOULD KEEP MINING
@@ -137,6 +136,14 @@ public class Player{
 			dropoffs.put(dropoff.id, dropoff);
 		}
 		shipyardPlanner.clear();
+	}
+	public ArrayList<Position> getDropoffPoints(){
+		ArrayList<Position> dropoffPoints = new ArrayList<Position>();
+		dropoffPoints.add(this.shipyard.position);
+		for(Dropoff dropoff : this.dropoffs.values()){
+			dropoffPoints.add(dropoff.position);
+		}
+		return dropoffPoints;
 	}
 	public void logShipyardPlanner(){
 		for(int key : shipyardPlanner.keySet()){
