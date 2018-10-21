@@ -176,6 +176,13 @@ public class GameMap{
 		}
 		return possibleMoves;
 	}
+	public Direction naiveNavigateSuicide(final Ship ship, final Position destination){
+		// getUnsafeMoves normalizes for us
+		for(final Direction direction : getUnsafeMoves(ship.position, destination)){
+			return direction;
+		}
+		return Direction.STILL;
+	}
 	public Direction naiveNavigate(final Ship ship, final Position destination){
 		// getUnsafeMoves normalizes for us
 		for(final Direction direction : getUnsafeMoves(ship.position, destination)){

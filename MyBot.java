@@ -1,7 +1,7 @@
 import hlt.*;
 
-// TODO IMPLEMENT A*
-// TODO FIX TRAFFIC JAMS, MAYBE MAKE SYSTEM THAT KEEPS TRACK OF WHAT TURNS SHIPS WILL BE COMING BACK AND MAKING SURE NO ONE ELSE HAS THEIR SLOT
+// TODO use ship planner to start dropoffs, choose wall closest to most Halite
+// TODO early game send bots back once their total halite >= 1000
 
 public class MyBot{
 	public static void main(final String[] args){

@@ -46,6 +46,9 @@ public class Game{
 			}
 		}
 	}
+	public int getNumTurnsLeft() {
+		return this.numTurns - this.turnNumber;
+	}
 	public int getNumTurns(){
 		return this.numTurns;
 	}

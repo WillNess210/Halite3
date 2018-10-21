@@ -28,11 +28,18 @@ public class Player{
 		Log.logVar("NumWalls", gameMap.numWalls + "");
 		Log.logVarln("MinHaliteWall", minHaliteWall + "");
 		// DETERMINE A MOVE FOR EACH SHIP
+		boolean firstShip = true;
 		for(final Ship ship : ships.values()){
 			ship.log();
 			int turnsHome = ship.position.distanceTo(this.shipyard.position);
-			if(ship.turnsStill > 5){  // CHECK IF STUCK
+			if(ship.turnsStill > 5){ // CHECK IF STUCK
 				CommandQueue.add(ship.getTurnRandomMove(this, gameMap));
+			}else if(turnsHome + 10 > game.getNumTurnsLeft()){ // GO AND SUICIDE
+				if(firstShip){ // first ship needs to get out of the way
+					CommandQueue.add(ship.moveTowards(gameMap, new Position(gameMap.width - 1, gameMap.height - 1)));
+				}else{
+					CommandQueue.add(ship.getTurnSuicide(this, gameMap));
+				}
 			}else if((ship.halite > 800 && !shipyardPlanner.containsKey(turnsHome)) || ship.shouldGoDeposit){ // CHECK IF I SHOULD GO DEPOSIT
 				ship.shouldGoDeposit = true;
 				shipyardPlanner.put(turnsHome, ship);
@@ -45,11 +52,12 @@ public class Player{
 				CommandQueue.add(ship.getTurnFindMine(this, gameMap));
 			}
 			Log.logln();
+			firstShip = false;
 		}
 		gameMap.logTunnelMap(this);
 		this.logShipyardPlanner();
 		// DETERMINE IF WE SHOULD SPAWN
-		if(game.turnNumber <= (3 * game.getNumTurns()) / 4 && this.halite >= Constants.SHIP_COST
+		if(game.turnNumber <= (3 * game.getNumTurns()) / 5 && this.halite >= Constants.SHIP_COST
 				&& !gameMap.at(shipyard).isOccupied()){
 			CommandQueue.add(shipyard.spawn());
 			Log.logln("SPAWNING");

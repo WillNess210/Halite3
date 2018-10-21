@@ -12,11 +12,21 @@ public class Ship extends Entity{
 		this.turnsStill = 0;
 		this.shouldGoDeposit = false;
 	}
+	public Command getTurnSuicide(Player me, GameMap gameMap){
+		Log.logVar("INTENT", "MOVE TO SUICIDE");
+		if(this.position.distanceTo(me.shipyard.position) == 1){
+			Direction d = gameMap.naiveNavigateSuicide(this, me.shipyard.position);
+			return this.moveSuicide(d, gameMap);
+		}else{
+			Direction d = AStar.aStar(this, gameMap, me.shipyard.position);
+			return this.move(d, gameMap);
+		}
+	}
 	public Command getTurnDeposit(Player me, GameMap gameMap){
 		Log.logVar("INTENT", "MOVE TO DEPOSIT");
 		Log.logVar("GOAL", me.shipyard.position.toString());
 		this.shouldGoDeposit = true;
-		Direction d = gameMap.naiveNavigate(this, me.shipyard.position);
+		Direction d = AStar.aStar(this, gameMap, me.shipyard.position);
 		return this.move(d, gameMap);
 	}
 	public Command getTurnFindMine(Player me, GameMap gameMap){
@@ -51,6 +61,20 @@ public class Ship extends Entity{
 	}
 	public Command makeDropoff(){
 		return Command.transformShipIntoDropoffSite(id);
+	}
+	public Command moveTowards(GameMap gameMap, Position goal){
+		return this.move(AStar.aStar(this, gameMap, goal), gameMap);
+	}
+	public Command moveSuicide(final Direction direction, GameMap gameMap){
+		if(this.halite >= gameMap.at(this).halite / 10){
+			gameMap.at(this).markSafe();
+			this.position = this.position.directionalOffset(direction);
+			gameMap.at(this).markUnsafe(this);
+			this.turnsStill = 0;
+			return Command.move(id, direction);
+		}else{
+			return this.stayStill();
+		}
 	}
 	public Command move(final Direction direction, GameMap gameMap){
 		if(this.halite >= gameMap.at(this).halite / 10
