@@ -11,7 +11,7 @@ def compile_bot(bot):
         stderr=subprocess.PIPE)
 
 
-def run_match(bot1, bot2):
+def run_match(bot1, bot1args,  bot2, bot2args, matchargs):
     bot1java = ""
     if len(bot1) == 0:
         bot1java = "java MyBot"
@@ -23,9 +23,10 @@ def run_match(bot1, bot2):
     else:
         bot2java = "java -classpath " + bot2 + " MyBot"
         # 'halite.exe --replay-directory gym/replays/ --results-as-json "' + bot1java + '" "' + bot2java + '"',
+    print('halite.exe --no-replay --no-logs --results-as-json ' + matchargs + ' "' + bot1java + ' ' + bot1args + '" "' + bot2java + ' ' + bot2args + '"')
     p = subprocess.Popen(
         'cd .. &'
-        'halite.exe --no-replay --no-logs --results-as-json "' + bot1java + '" "' + bot2java + '"',
+        'halite.exe --no-replay --no-logs --results-as-json ' + matchargs + ' "' + bot1java + ' ' + bot1args + '" "' + bot2java + ' ' + bot2args + '"',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
@@ -79,8 +80,8 @@ total_games = 0
 games = [0, 0, 0, 0, 0]
 wins = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]  # 32, 40, 48, 56, 64
 scores = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]] # 32, 40, 48, 56, 64
-while datetime.datetime.now().hour < 8 or datetime.datetime.now().minute < 15:
-    results = run_match(BOT1, BOT2)
+while datetime.datetime.now().hour < 8 or datetime.datetime.now().minute < 20:
+    results = run_match(BOT1, "",  BOT2, "", "--width 48 --height 48")
     total_games = total_games + 1
     print("GAME " + str(total_games))
     print_match_stats(results)
