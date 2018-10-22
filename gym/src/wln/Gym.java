@@ -7,15 +7,15 @@ public class Gym{
 	public ResultsParser rp;
 	public Gym(Bot a){
 		this.game = new Game(a);
-		rp = new ResultsParser();
+		rp = new ResultsParser(1);
 	}
 	public Gym(Bot a, Bot b){
 		this.game = new Game(a, b);
-		rp = new ResultsParser();
+		rp = new ResultsParser(2);
 	}
 	public Gym(Bot a, Bot b, Bot c, Bot d){
 		this.game = new Game(a, b, c, d);
-		rp = new ResultsParser();
+		rp = new ResultsParser(4);
 	}
 	public void compileBots() throws IOException{
 		MyProcessBuilder builder = new MyProcessBuilder();
@@ -34,7 +34,6 @@ public class Gym{
 		this.feedToRP();
 	}
 	public void feedToRP(){
-		rp.setup(this.game);
 		rp.addGameResults(this.game);
 	}
 	public void runGames(int num) throws IOException, JSONException{

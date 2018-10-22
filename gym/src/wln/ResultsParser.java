@@ -3,80 +3,77 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ResultsParser{
-	int totalGames;
-	Map<Integer, Integer> wins;
-	Map<Integer, Integer> score;
-	Map<Integer, Integer> gamesSize;
-	Map<Integer, Map<Integer, Integer>> winsSize;
-	Map<Integer, Map<Integer, Integer>> scoreSize;
-	public ResultsParser(){
-		gamesSize = new LinkedHashMap<>();
-		winsSize = new LinkedHashMap<>();
-		scoreSize = new LinkedHashMap<>();
-		wins = new LinkedHashMap<>();
-		score = new LinkedHashMap<>();
-		totalGames = 0;
+	int totalGames, numBots;
+	int[] scores;
+	int[] wins;
+	int[] numGames;
+	int[][] scoresSize;
+	int[][] winsSize;
+	int[] possibleSizes = { 32, 40, 48, 56, 64 };
+	public ResultsParser(int numBots){
+		this.numBots = numBots;
+		this.totalGames = 0;
+		scores = new int[numBots];
+		wins = new int[numBots];
+		numGames = new int[possibleSizes.length];
+		scoresSize = new int[possibleSizes.length][numBots];
+		winsSize = new int[possibleSizes.length][numBots];
 	}
-	public void setup(Game game){
-		int gameSize = game.size;
-		if(!gamesSize.containsKey(gameSize)){
-			gamesSize.put(gameSize, 0);
-			for(Bot bot : game.players){
-				winsSize.put(gameSize, new LinkedHashMap<>());
-				winsSize.get(gameSize).put(bot.id, 0);
-				scoreSize.put(gameSize, new LinkedHashMap<>());
-				scoreSize.get(gameSize).put(bot.id, 0);
-			}
-		}
-		for(Bot bot : game.players){
-			if(!wins.containsKey(bot.id)){
-				wins.put(bot.id, 0);
-				score.put(bot.id, 0);
-			}
-		}
+	public int sizeToIndex(int size){
+		return (size - 32) / 8;
+	}
+	public int indexToSize(int index){
+		return (index * 8) + 32;
 	}
 	public void addGameResults(Game game){
-		this.totalGames++;
 		int gameSize = game.size;
-		gamesSize.put(gameSize, gamesSize.get(gameSize) + 1);
+		int gameIndex = this.sizeToIndex(gameSize);
+		totalGames++;
+		numGames[gameIndex]++;
 		for(Bot bot : game.players){
-			if(bot.rank == 1){
-				winsSize.get(gameSize).put(bot.id, winsSize.get(gameSize).get(bot.id) + 1);
-				wins.put(bot.id, wins.get(bot.id) + 1);
-			}
-			scoreSize.get(gameSize).put(bot.id, scoreSize.get(gameSize).get(bot.id) + bot.score);
-			score.put(bot.id, score.get(bot.id) + bot.score);
+			scores[bot.id] += bot.score;
+			wins[bot.id] += bot.rank == 1 ? 1 : 0;
+			scoresSize[gameIndex][bot.id] += bot.score;
+			winsSize[gameIndex][bot.id] += bot.rank == 1 ? 1 : 0;
 		}
 	}
 	public void printCurrentResults(){
 		System.out.println("=== GAMES ===");
-		System.out.println("Total Games Played: " + this.totalGames);
-		for(int mapSize : gamesSize.keySet()){
-			System.out.println(mapSize + "x" + mapSize + ": " + gamesSize.get(mapSize));
+		System.out.println("Total: " + this.totalGames);
+		for(int size : this.possibleSizes){
+			int index = this.sizeToIndex(size);
+			System.out.println(size + "x" + size + ": " + this.numGames[index]);
 		}
-		System.out.println("=== TOTAL WINS ===");
-		for(int botid : wins.keySet()){
-			System.out.println(botid + ": " + wins.get(botid));
+		System.out.println("=== WINS ===");
+		System.out.print("Total:");
+		for(int winNum : this.wins){
+			System.out.print(" " + winNum);
 		}
-		System.out.println("=== AVERAGE SCORE ===");
-		for(int botid : score.keySet()){
-			System.out.println(botid + ": " + (score.get(botid) / this.totalGames));
-		}
-		System.out.println("=== WINS ON SIZE ===");
-		for(int mapSize : gamesSize.keySet()){
-			System.out.print(mapSize + "x" + mapSize + ":");
-			Map<Integer, Integer> winsLocal = winsSize.get(mapSize);
-			for(int botid : winsLocal.keySet()){
-				System.out.print(" " + winsLocal.get(botid));
+		System.out.println();
+		for(int size : this.possibleSizes){
+			int index = this.sizeToIndex(size);
+			System.out.print(size + "x" + size + ":");
+			for(int winNum : this.winsSize[index]){
+				System.out.print(" " + winNum);
 			}
 			System.out.println();
 		}
-		System.out.println("=== SCORE ON SIZE ===");
-		for(int mapSize : scoreSize.keySet()){
-			System.out.print(mapSize + "x" + mapSize + ":");
-			Map<Integer, Integer> scoresLocal = scoreSize.get(mapSize);
-			for(int botid : scoresLocal.keySet()){
-				System.out.print(" " + (scoresLocal.get(botid) / gamesSize.get(mapSize)));
+		System.out.println("=== SCORES ===");
+		int numTotalGames = Math.max(1, this.totalGames);
+		int[] numSizeGames = new int[this.possibleSizes.length];
+		for(int i = 0; i < numSizeGames.length; i++) {
+			numSizeGames[i] = Math.max(1, this.numGames[i]);
+		}
+		System.out.print("Total:");
+		for(int score : this.scores) {
+			System.out.print(" " + (score/numTotalGames));
+		}
+		System.out.println();
+		for(int size : this.possibleSizes) {
+			int index = this.sizeToIndex(size);
+			System.out.print(size + "x" + size + ":");
+			for(int score : this.scoresSize[index]) {
+				System.out.print(" " + (score/numSizeGames[index]));
 			}
 			System.out.println();
 		}
