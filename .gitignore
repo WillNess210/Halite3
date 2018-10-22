@@ -16,3 +16,5 @@ __pycache__/
 wlnO/*.*
 hltO/*.*
 MyBotO.java
+otherbots/*
+results.txt

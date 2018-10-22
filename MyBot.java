@@ -11,7 +11,7 @@ public class MyBot{
 			rngSeed = System.nanoTime();
 		}
 		Game game = new Game();
-		game.ready("WillBot");
+		game.ready("WillBotV7");
 		Log.logln("Successfully created bot! My Player ID is " + game.myId + ". Bot rng seed is " + rngSeed + ".");
 		Log.logVar("Map Dimensions", game.gameMap.width + " x " + game.gameMap.height);
 		Log.logVarln("# Turns", game.getNumTurns() + "");
