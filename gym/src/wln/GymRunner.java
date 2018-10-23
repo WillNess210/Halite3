@@ -40,7 +40,8 @@ public class GymRunner{
 			gamesPlayed[i] = 0;
 		}
 		while(!alarm.hasReachedTime()){
-			for(int i = 0; i < args.size() && !alarm.hasReachedTime(); i++){
+			int mapSeed = -1;
+			for(int i = 0; i < args.size(); i++){
 				bots[0].clearArguments();
 				String[] thisargs = args.get(i);
 				String argsString = "";
@@ -52,7 +53,14 @@ public class GymRunner{
 				myGym.game.fixedSize = true;
 				myGym.game.size = 48;
 				myGym.game.resultsAsJson = true;
+				if(i > 0){
+					myGym.game.fixedSeed = true;
+					myGym.game.seed = mapSeed;
+				}
 				myGym.runGames(1);
+				if(i == 0){
+					mapSeed = myGym.game.seed;
+				}
 				int myScore = myGym.rp.getAverageScores()[0];
 				gamesPlayed[i]++;
 				scores[i] += myScore;

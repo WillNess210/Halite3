@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class Game{
 	Bot[] players;
-	public boolean logs, replay, fixedSize, resultsAsJson;
+	public boolean logs, replay, fixedSize, resultsAsJson, fixedSeed;
 	public int size, seed;
 	String replayDirectory;
 	public Game(Bot bot){
@@ -28,7 +28,7 @@ public class Game{
 		players[3] = bot4;
 		this.loadDefault();
 	}
-	public Game(Bot[] bots) {
+	public Game(Bot[] bots){
 		this.players = bots;
 	}
 	public void loadDefault(){
@@ -36,6 +36,7 @@ public class Game{
 		this.logs = false;
 		this.replay = false;
 		this.fixedSize = false;
+		this.fixedSeed = false;
 		this.replayDirectory = "replays/";
 		this.size = 48;
 		for(int i = 0; i < players.length; i++){
@@ -59,7 +60,7 @@ public class Game{
 	public void printGameResults(){
 		String result = "";
 		for(int i = 0; i < players.length; i++){
-			result += "| " + i + players[i].rank + players[i].score + " |";
+			result += "| " + i + " " + players[i].rank + " " +  players[i].score + " |";
 		}
 		result += " - " + this.size + "x" + this.size;
 		System.out.println(result);
@@ -77,6 +78,9 @@ public class Game{
 		}
 		if(this.fixedSize){
 			toReturn += "--width " + this.size + " --height " + this.size + " ";
+		}
+		if(this.fixedSeed){
+			toReturn += "--seed " + this.seed + " ";
 		}
 		if(this.resultsAsJson){
 			toReturn += "--results-as-json ";
