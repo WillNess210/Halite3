@@ -34,20 +34,19 @@ public class GymRunner{
 		scores = new int[args.size()];
 	}
 	public void runUntil(int hour, int minute) throws IOException, JSONException{
+		BooleanTimeAlarm alarm = new BooleanTimeAlarm(hour, minute);
 		for(int i = 0; i < args.size(); i++){
 			scores[i] = 0;
 			gamesPlayed[i] = 0;
 		}
-		while(true){
-			Calendar rightNow = Calendar.getInstance();
-			if(rightNow.get(Calendar.HOUR_OF_DAY) == hour && rightNow.get(Calendar.MINUTE) >= minute){
-				break;
-			}
-			for(int i = 0; i < args.size(); i++){
+		while(!alarm.hasReachedTime()){
+			for(int i = 0; i < args.size() && !alarm.hasReachedTime(); i++){
 				bots[0].clearArguments();
 				String[] thisargs = args.get(i);
+				String argsString = "";
 				for(String arg : thisargs){
 					bots[0].addArgument(arg);
+					argsString += arg + " ";
 				}
 				Gym myGym = new Gym(bots);
 				myGym.game.fixedSize = true;
@@ -57,8 +56,10 @@ public class GymRunner{
 				int myScore = myGym.rp.getAverageScores()[0];
 				gamesPlayed[i]++;
 				scores[i] += myScore;
+				System.out.println(argsString + " - " + myScore);
 			}
 		}
+		// 30 35 wins first
 		for(int i = 0; i < args.size(); i++){
 			for(String arg : args.get(i)){
 				System.out.print(arg + " ");

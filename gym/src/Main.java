@@ -23,6 +23,6 @@ public class Main{
 			}
 		}
 		GymRunner myGR = new GymRunner(params, myBot);
-		myGR.runUntil(23, 30);
+		myGR.runUntil(8, 15);
 	}
 }
