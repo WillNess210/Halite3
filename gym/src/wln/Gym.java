@@ -5,6 +5,7 @@ import org.json.JSONException;
 public class Gym{
 	public Game game;
 	public ResultsParser rp;
+	public boolean printIndividualGames = false;
 	public Gym(Bot a){
 		this.game = new Game(a);
 		rp = new ResultsParser(1);
@@ -16,6 +17,10 @@ public class Gym{
 	public Gym(Bot a, Bot b, Bot c, Bot d){
 		this.game = new Game(a, b, c, d);
 		rp = new ResultsParser(4);
+	}
+	public Gym(Bot[] bots) {
+		this.game = new Game(bots);
+		rp = new ResultsParser(game.players.length);
 	}
 	public void compileBots() throws IOException{
 		MyProcessBuilder builder = new MyProcessBuilder();
@@ -30,7 +35,8 @@ public class Gym{
 		MyProcessBuilder builder = new MyProcessBuilder();
 		builder.addGameRun(game);
 		builder.runAndLoadGame(game);
-		game.printGameResults();
+		if(this.printIndividualGames)
+			game.printGameResults();
 		this.feedToRP();
 	}
 	public void feedToRP(){
@@ -39,12 +45,14 @@ public class Gym{
 	public void runGames(int num) throws IOException, JSONException{
 		this.compileBots();
 		for(int i = 1; i <= num; i++){
-			System.out.println("===GAME " + i + "===");
+			if(this.printIndividualGames)
+				System.out.println("===GAME " + i + "===");
 			this.runSingleGame();
 		}
 		this.printResults();
 	}
 	public void printResults(){
-		this.rp.printCurrentResults();
+		if(this.printIndividualGames)
+			this.rp.printCurrentResults();
 	}
 }

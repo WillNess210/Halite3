@@ -35,6 +35,13 @@ public class ResultsParser{
 			winsSize[gameIndex][bot.id] += bot.rank == 1 ? 1 : 0;
 		}
 	}
+	public int[] getAverageScores() {
+		int[] avgScores = new int[this.numBots];
+		for(int i = 0; i < this.numBots; i++) {
+			avgScores[i] = scores[i] / this.totalGames;
+		}
+		return avgScores;
+	}
 	public void printCurrentResults(){
 		System.out.println("=== GAMES ===");
 		System.out.println("Total: " + this.totalGames);

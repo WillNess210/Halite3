@@ -15,9 +15,9 @@ public class Bot{
 		return Constants.startDirectory + "/" + this.location;
 	}
 	public String getCommandLineRun(){
-		String toReturn = "java -classpath " + location + " MyBot ";
+		String toReturn = "java -classpath " + location + " MyBot";
 		for(String arg : args){
-			toReturn += arg;
+			toReturn += " " + arg;
 		}
 		return toReturn;
 	}

@@ -6,8 +6,8 @@ import org.json.JSONObject;
 
 public class Game{
 	Bot[] players;
-	boolean logs, replay, fixedSize, resultsAsJson;
-	int size, seed;
+	public boolean logs, replay, fixedSize, resultsAsJson;
+	public int size, seed;
 	String replayDirectory;
 	public Game(Bot bot){
 		players = new Bot[1];
@@ -27,6 +27,9 @@ public class Game{
 		players[2] = bot3;
 		players[3] = bot4;
 		this.loadDefault();
+	}
+	public Game(Bot[] bots) {
+		this.players = bots;
 	}
 	public void loadDefault(){
 		this.resultsAsJson = true;

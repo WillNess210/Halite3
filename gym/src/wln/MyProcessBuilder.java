@@ -83,6 +83,7 @@ public class MyProcessBuilder{
 		boolean started = false;
 		String json = "";
 		for(int i = 0; i < strings.size(); i++){
+			System.out.println(strings.get(i));
 			if(strings.get(i).equals("{")){
 				started = true;
 			}
