@@ -56,7 +56,7 @@ public class Game{
 	public void printGameResults(){
 		String result = "";
 		for(int i = 0; i < players.length; i++){
-			result += "| " + i + " r:" + players[i].rank + " s:" + players[i].score + " |";
+			result += "| " + i + players[i].rank + players[i].score + " |";
 		}
 		result += " - " + this.size + "x" + this.size;
 		System.out.println(result);

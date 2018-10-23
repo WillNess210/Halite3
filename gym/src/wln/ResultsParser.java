@@ -1,6 +1,4 @@
 package wln;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ResultsParser{
 	int totalGames, numBots;

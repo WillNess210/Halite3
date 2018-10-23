@@ -11,8 +11,6 @@ public class Main{
 		Bot myBot = new Bot("mybot");
 		Bot starterBot = new Bot("otherbots/StarterBot");
 		Bot V6 = new Bot("otherbots/V6");
-		// GAME SETUP
-		Game game = new Game(myBot, V6);
 		// CODE
 		Gym myGym = new Gym(myBot, V6);
 		myGym.runGames(5);
