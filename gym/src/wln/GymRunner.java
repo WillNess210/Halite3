@@ -33,8 +33,15 @@ public class GymRunner{
 		gamesPlayed = new int[args.size()];
 		scores = new int[args.size()];
 	}
+	public void runUntil(int hour, int minute, boolean pm) throws IOException, JSONException{
+		BooleanTimeAlarm alarm = new BooleanTimeAlarm(hour, minute, pm);
+		this.runUntil(alarm);
+	}
 	public void runUntil(int hour, int minute) throws IOException, JSONException{
 		BooleanTimeAlarm alarm = new BooleanTimeAlarm(hour, minute);
+		this.runUntil(alarm);
+	}
+	public void runUntil(BooleanTimeAlarm alarm) throws IOException, JSONException{
 		for(int i = 0; i < args.size(); i++){
 			scores[i] = 0;
 			gamesPlayed[i] = 0;

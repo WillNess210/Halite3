@@ -10,6 +10,12 @@ public class BooleanTimeAlarm{
 		this.hitHour = false;
 		this.hitMinute = false;
 	}
+	public BooleanTimeAlarm(int hour, int minute, boolean PM){
+		this.hour = PM ? hour + 12 : hour;
+		this.minute = minute;
+		this.hitHour = false;
+		this.hitMinute = false;
+	}
 	public boolean hasReachedTime(){
 		Calendar rightNow = Calendar.getInstance();
 		int thisMinute = rightNow.get(Calendar.MINUTE);
@@ -23,5 +29,17 @@ public class BooleanTimeAlarm{
 			this.hitMinute = true;
 		}
 		return this.hitHour && this.hitMinute;
+	}
+	public int getSetHour(){
+		return this.hour;
+	}
+	public int getSetMinute(){
+		return this.minute;
+	}
+	public static int getHour(){
+		return Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+	}
+	public static int getMinute(){
+		return Calendar.getInstance().get(Calendar.MINUTE);
 	}
 }
