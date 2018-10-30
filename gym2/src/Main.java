@@ -20,5 +20,9 @@ public class Main{
 //		ArgumentGym gym = new ArgumentGym(sets, team);
 //		gym.runGamesUntil(new Time(11, 00, PM));
 //		gym.printResults();
+		BotTeam team = new BotTeam(myBot, V61);
+		Gym gym = new Gym(team);
+		gym.runGames(200);
+		gym.printResults();
 	}
 }
