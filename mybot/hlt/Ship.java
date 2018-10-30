@@ -5,7 +5,7 @@ import java.util.Random;
 public class Ship extends Entity{
 	public int halite, turnsAlive, turnsStill, distanceToDropoff;
 	public boolean shouldGoDeposit;
-	public Position mineSpot;
+	public Position endGoal;
 	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
 		super(owner, position, id);
 		this.halite = halite;
@@ -13,90 +13,25 @@ public class Ship extends Entity{
 		this.turnsStill = 0;
 		this.shouldGoDeposit = false;
 		this.distanceToDropoff = 0;
-		this.mineSpot = null;
+		this.endGoal = null;
 	}
-	public Command getTurnSuicide(Player me, GameMap gameMap){
-		Log.logVar("INTENT", "MOVE TO SUICIDE");
-		if(this.position.samePosition(me.shipyard.position)){
-			Log.log("READY TO BE HIT");
-			return this.stayStill();
-		}else if(this.position.distanceTo(me.shipyard.position, gameMap) == 1){
-			Direction d = gameMap.naiveNavigateSuicide(this, me.shipyard.position);
-			return this.moveSuicide(d, gameMap);
-		}else{
-			Direction d = AStar.aStar(this, gameMap, me, me.shipyard.position);
-			return this.move(d, gameMap, me);
-		}
-	}
-	public Command getTurnDeposit(Player me, GameMap gameMap){
-		Log.logVar("INTENT", "MOVE TO DEPOSIT");
-		Log.logVar("GOAL", me.shipyard.toString());
-		this.shouldGoDeposit = true;
-		Direction d = AStar.aStar(this, gameMap, me, me.shipyard.position);
-		Log.logVar("MOVES AWAY", gameMap.at(me.shipyard).aDistTraveled + "");
-		return this.move(d, gameMap, me);
-	}
-	public Command getTurnFindMine(Player me, GameMap gameMap){
-		Log.logVar("INTENT", "FIND TO MINE");
-		Position closestWall = gameMap.getOptimizedPointToTunnelMapWall(me, this);
-		if(closestWall == null){
-			Log.log("CAN'T FIND ANYTHING");
-			return this.getTurnRandomMove(me, gameMap);
-		}
-		this.mineSpot = closestWall;
-		Log.logVar("MINE SPOT", this.mineSpot.toString());
-		Log.logVar("GOAL", closestWall.toString());
-		return this.move(AStar.aStar(this, gameMap, me, closestWall), gameMap, me);
-		//return this.move(gameMap.naiveNavigate(this, closestWall), gameMap);
-	}
-	public Command getTurnMine(Player me, GameMap gameMap){
-		Log.logVar("INTENT", "KEEP MINING");
-		this.turnsStill = -1;
-		this.mineSpot = null;
-		gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
-		return this.stayStill();
-	}
-	public Command getTurnStill(Player me, GameMap gameMap){
-		Log.logVar("INTENT", "IDLE");
-		this.turnsStill = -1;
-		return this.stayStill();
-	}
-	public Command getTurnRandomMove(Player me, GameMap gameMap){
-		Log.log("STUCK");
+	public Position randomEmptyNeighbor(Player me, GameMap gameMap){
 		Random rng = new Random();
 		ArrayList<Position> ns = this.position.getEmptyNeighbours(me, gameMap);
 		if(ns.size() == 0){
-			return this.stayStill();
+			return this.position;
 		}
-		return this.move(gameMap.naiveNavigate(this, ns.get(rng.nextInt(ns.size())), me), gameMap, me);
+		return ns.get(rng.nextInt(ns.size()));
 	}
-	public boolean isFull(){
-		return halite >= Constants.MAX_HALITE;
+	public Position getMineSpot(Player me, GameMap gameMap){
+		return gameMap.getOptimizedPointToTunnelMapWall(me, this);
 	}
-	public Command makeDropoff(){
-		return Command.transformShipIntoDropoffSite(id);
-	}
-	public Command moveTowardsMineSpot(GameMap gameMap, Player me){
-		Log.logVar("INTENT", "MOVE TO MINE SPOT");
-		Log.logVar("MINE SPOT", this.mineSpot.toString());
-		gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
-		return this.move(AStar.aStar(this, gameMap, me, this.mineSpot), gameMap, me);
+	// TODO update to go to closest dropoff/shipyard
+	public Position goToShipyard(Player me, GameMap gameMap){
+		return me.shipyard.position;
 	}
 	public Command moveTowards(GameMap gameMap, Position goal, Player me){
 		return this.move(AStar.aStar(this, gameMap, me, goal), gameMap, me);
-	}
-	public Command moveSuicide(final Direction direction, GameMap gameMap){
-		if(this.halite >= gameMap.at(this).halite / 10){
-			gameMap.at(this).markSafe();
-			Position meNext = this.position.directionalOffset(direction, gameMap);
-			this.position.x = meNext.x;
-			this.position.y = meNext.y;
-			gameMap.at(this).markUnsafe(this);
-			this.turnsStill = 0;
-			return Command.move(id, direction);
-		}else{
-			return this.stayStill();
-		}
 	}
 	public Command move(final Direction direction, GameMap gameMap, Player me){
 		if(this.halite >= gameMap.at(this).halite / 10
@@ -108,29 +43,26 @@ public class Ship extends Entity{
 			gameMap.at(this).markUnsafe(this);
 			this.turnsStill = 0;
 			return Command.move(id, direction);
+		}else if(me.startSuicide && this.halite >= gameMap.at(this).halite / 10
+				&& this.position.directionalOffset(direction, gameMap).samePosition(me.shipyard.position)){
+			return Command.move(id, direction);
 		}else{
 			return this.stayStill();
 		}
 	}
+	public Command stayStill(){
+		this.turnsStill++;
+		return Command.move(id, Direction.STILL);
+	}
 	public int getTurnsToAfter(GameMap gameMap, Position b){
 		return gameMap.at(b).aDistTraveled;
-	}
-	public Position getClosest(GameMap gameMap, ArrayList<Position> b){
-		Position closest = b.get(0);
-		for(Position pos : b){
-			if(pos.distanceTo(this.position, gameMap) < closest.distanceTo(this.position, gameMap)){
-				closest = pos;
-			}
-		}
-		return closest;
 	}
 	public int getTurnsTo(GameMap gameMap, Position b, Player me){
 		AStar.aStar(this, gameMap, me, b);
 		return this.getTurnsToAfter(gameMap, b);
 	}
-	public Command stayStill(){
-		this.turnsStill++;
-		return Command.move(id, Direction.STILL);
+	public boolean isFull(){
+		return this.halite >= Constants.MAX_HALITE;
 	}
 	public void _update(Player me, Position position, int halite){
 		this.position = position;
