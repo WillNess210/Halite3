@@ -33,6 +33,13 @@ public class Ship extends Entity{
 	public Command moveTowards(GameMap gameMap, Position goal, Player me){
 		return this.move(AStar.aStar(this, gameMap, me, goal), gameMap, me);
 	}
+	public Command moveSwap(final Direction direction, GameMap gameMap, Player me){ // only call when both have enough halite to move
+		this.turnsStill = 0;
+		Position next = this.position.directionalOffset(direction, gameMap);
+		this.position.x = next.x;
+		this.position.y = next.y;
+		return Command.move(this.id, direction);
+	}
 	public Command move(final Direction direction, GameMap gameMap, Player me){
 		if(this.halite >= gameMap.at(this).halite / 10
 				&& gameMap.at(this.position.directionalOffset(direction, gameMap)).canMoveOn(me)){

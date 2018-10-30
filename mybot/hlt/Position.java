@@ -7,6 +7,10 @@ public class Position{
 		this.x = x;
 		this.y = y;
 	}
+	public Position(Position b) {
+		this.x = b.x;
+		this.y = b.y;
+	}
 	Position getHighestHaliteEmptyNeighbour(Player me, GameMap gameMap){
 		ArrayList<Position> nbrs = this.getEmptyNeighbours(me, gameMap);
 		if(nbrs.size() == 0){
@@ -37,6 +41,22 @@ public class Position{
 		ns[2] = this.directionalOffset(Direction.SOUTH, gameMap);
 		ns[3] = this.directionalOffset(Direction.WEST, gameMap);
 		return ns;
+	}
+	Direction positionalOffset(final Position p, GameMap gameMap){
+		final int dx = this.x - p.x;
+		final int dy = this.y - p.y;
+		if(Math.abs(dx) + Math.abs(dy) != 1){
+			return Direction.STILL;
+		}else if(dx == -1){
+			return Direction.EAST;
+		}else if(dx == 1){
+			return Direction.WEST;
+		}else if(dy == -1){
+			return Direction.SOUTH;
+		}else if(dy == 1){
+			return Direction.NORTH;
+		}
+		return Direction.STILL;
 	}
 	Position directionalOffset(final Direction d, GameMap gameMap){
 		final int dx;

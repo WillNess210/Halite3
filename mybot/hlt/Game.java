@@ -55,6 +55,7 @@ public class Game{
 	}
 	public void endTurn(){
 		for(final Command command : CommandQueue.commandQueue){
+			Log.logln(command.command);
 			System.out.print(command.command);
 			System.out.print(' ');
 		}

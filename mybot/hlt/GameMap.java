@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class GameMap{
 	public final int width;
 	public final int height;
-	public int[][] wallMap;
+	public int[][] wallMap, swapMap;
 	public int numWalls;
 	public MapCell[][] cells;
 	public GameMap(final int width, final int height){
@@ -15,9 +15,11 @@ public class GameMap{
 			cells[y] = new MapCell[width];
 		}
 		wallMap = new int[width][height];
+		swapMap = new int[width][height];
 		for(int i = 0; i < width; i++){
 			for(int j = 0; j < height; j++){
 				wallMap[i][j] = -1;
+				swapMap[i][j] = 0;
 			}
 		}
 		numWalls = 0;
@@ -40,6 +42,40 @@ public class GameMap{
 			}
 		}
 		return toReturn;
+	}
+	ArrayList<Swap> getPossibleSwaps(Player me){
+		this.resetSwapMap();
+		this.fillSwapMap(me);
+		ArrayList<Swap> possible = new ArrayList<Swap>();
+		for(Ship ship : me.ships.values()){
+			if(swapMap[ship.position.x][ship.position.y] == 3){
+				swapMap[ship.position.x][ship.position.y] = 0;
+				for(Position n : ship.position.getNeighbours(this)){
+					if(swapMap[n.x][n.y] == 3 && this.at(n).ship != null){
+						possible.add(new Swap(ship, this.at(n).ship));
+					}
+				}
+			}
+		}
+		return possible;
+	}
+	public void fillSwapMap(Player me){
+		for(Ship ship : me.ships.values()){
+			if(ship.halite >= this.at(ship).halite / 10){
+				swapMap[ship.position.x][ship.position.y] += 2;
+				Position[] ns = ship.position.getNeighbours(this);
+				for(Position n : ns){
+					swapMap[n.x][n.y] += 1;
+				}
+			}
+		}
+	}
+	public void resetSwapMap(){
+		for(int i = 0; i < width; i++){
+			for(int j = 0; j < height; j++){
+				swapMap[i][j] = 0;
+			}
+		}
 	}
 	public void fillTunnelMap(Player me, int minHaliteWall){
 		// reset tunnel map

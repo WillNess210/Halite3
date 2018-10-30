@@ -66,10 +66,38 @@ public class Player{
 			// FIND SOMEWHERE TO MINE
 			ship.endGoal = ship.getMineSpot(this, gameMap);
 		}
+		Log.logln();
 		for(final Ship ship : ships.values()){
-			CommandQueue.add(ship.moveTowards(gameMap, ship.endGoal, this));
+			Log.logln(ship.id.id + ": " + ship.endGoal.toString());
 		}
-		gameMap.logTunnelMap(this);
+		// FIND POSSIBLE SWAPS
+		ArrayList<Swap> possibleSwaps = gameMap.getPossibleSwaps(this);
+		Log.logln("POSSIBLE SWAPS: ");
+		for(Swap swap : possibleSwaps){
+			Log.logln(swap.a.id.id + " & " + swap.b.id.id);
+		}
+		ArrayList<Ship> swappedShips = new ArrayList<Ship>();
+		for(Swap swap : possibleSwaps){
+			Ship a = swap.a;
+			Ship b = swap.b;
+			if(!swappedShips.contains(a) && !swappedShips.contains(b)
+					&& b.position.distanceTo(a.endGoal, gameMap) < a.position.distanceTo(a.endGoal, gameMap)
+					&& a.position.distanceTo(b.endGoal, gameMap) < b.position.distanceTo(b.endGoal, gameMap)){ // IF SWAPPING WOULD BE BENEFICIAL, DO IT
+				Position aBefore = new Position(a.position);
+				CommandQueue.add(a.moveSwap(a.position.positionalOffset(b.position, gameMap), gameMap, this));
+				CommandQueue.add(b.moveSwap(b.position.positionalOffset(aBefore, gameMap), gameMap, this));
+				swappedShips.add(a);
+				swappedShips.add(b);
+				Log.logln("SWAP " + a.id.id + " " + b.id.id);
+			}
+		}
+		// START ON MOVEMENTS
+		for(final Ship ship : ships.values()){
+			if(!swappedShips.contains(ship)){
+				CommandQueue.add(ship.moveTowards(gameMap, ship.endGoal, this));
+			}
+		}
+		//gameMap.logTunnelMap(this);
 		//this.logShipyardPlanner();
 		// DETERMINE IF WE SHOULD SPAWN
 		if(totalHaliteAvailable >= (haliteRatio * game.ogTotalHalite) && this.halite >= Constants.SHIP_COST

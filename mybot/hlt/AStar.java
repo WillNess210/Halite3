@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class AStar{
 	public static Direction aStar(Ship s, GameMap gameMap, Player me, Position goal){
 		if(s.position.distanceTo(goal, gameMap) <= 1){ // if we're 1 away, don't bother with A*
-			Log.logVar("A*", "REROUTED TO NATIVE");
+			//Log.logVar("A*", "REROUTED TO NATIVE");
 			gameMap.at(goal).aDistTraveled = 0;
 			return gameMap.naiveNavigate(s, goal, me);
 		}
@@ -48,13 +48,13 @@ public class AStar{
 			}
 		}
 		if(target == null || target.parent == null){
-			Log.logVar("A*", "Fail");
+			//Log.logVar("A*", "Fail");
 			return Direction.STILL;
 		}else{
 			while(target.parent.parent != null){
 				target = target.parent;
 			}
-			Log.logVar("A*", target.position.toString());
+			//Log.logVar("A*", target.position.toString());
 			return gameMap.naiveNavigate(s, target.position, me);
 		}
 	}
