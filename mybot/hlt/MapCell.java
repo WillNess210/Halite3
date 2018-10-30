@@ -31,7 +31,7 @@ public class MapCell{
 	}
 	public boolean canMoveOn(Player me){
 		return ship == null
-				|| (me.shipyard.samePosition(this.position) && this.ship != null && this.ship.owner.id != me.id.id);
+				|| (me.shipyard.position.samePosition(this.position) && this.ship != null && this.ship.owner.id != me.id.id);
 	}
 	public boolean isOccupied(){
 		return ship != null;

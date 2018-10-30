@@ -6,8 +6,8 @@ public class Ship extends Entity{
 	public int halite, turnsAlive, turnsStill, distanceToDropoff;
 	public boolean shouldGoDeposit;
 	public Position mineSpot;
-	public Ship(final int x, final int y, final PlayerId owner, final EntityId id, final int halite){
-		super(x, y, owner, id);
+	public Ship(final PlayerId owner, final EntityId id, final Position position, final int halite){
+		super(owner, position, id);
 		this.halite = halite;
 		this.turnsAlive = 0;
 		this.turnsStill = 0;
@@ -17,14 +17,14 @@ public class Ship extends Entity{
 	}
 	public Command getTurnSuicide(Player me, GameMap gameMap){
 		Log.logVar("INTENT", "MOVE TO SUICIDE");
-		if(this.samePosition(me.shipyard)){
+		if(this.position.samePosition(me.shipyard.position)){
 			Log.log("READY TO BE HIT");
 			return this.stayStill();
-		}else if(this.distanceTo(me.shipyard, gameMap) == 1){
-			Direction d = gameMap.naiveNavigateSuicide(this, me.shipyard);
+		}else if(this.position.distanceTo(me.shipyard.position, gameMap) == 1){
+			Direction d = gameMap.naiveNavigateSuicide(this, me.shipyard.position);
 			return this.moveSuicide(d, gameMap);
 		}else{
-			Direction d = AStar.aStar(this, gameMap, me, me.shipyard);
+			Direction d = AStar.aStar(this, gameMap, me, me.shipyard.position);
 			return this.move(d, gameMap, me);
 		}
 	}
@@ -32,7 +32,7 @@ public class Ship extends Entity{
 		Log.logVar("INTENT", "MOVE TO DEPOSIT");
 		Log.logVar("GOAL", me.shipyard.toString());
 		this.shouldGoDeposit = true;
-		Direction d = AStar.aStar(this, gameMap, me, me.shipyard);
+		Direction d = AStar.aStar(this, gameMap, me, me.shipyard.position);
 		Log.logVar("MOVES AWAY", gameMap.at(me.shipyard).aDistTraveled + "");
 		return this.move(d, gameMap, me);
 	}
@@ -53,7 +53,7 @@ public class Ship extends Entity{
 		Log.logVar("INTENT", "KEEP MINING");
 		this.turnsStill = -1;
 		this.mineSpot = null;
-		gameMap.wallMap[this.x][this.y] = 100 + this.id.id;
+		gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
 		return this.stayStill();
 	}
 	public Command getTurnStill(Player me, GameMap gameMap){
@@ -64,7 +64,7 @@ public class Ship extends Entity{
 	public Command getTurnRandomMove(Player me, GameMap gameMap){
 		Log.log("STUCK");
 		Random rng = new Random();
-		ArrayList<Position> ns = this.getEmptyNeighbours(me, gameMap);
+		ArrayList<Position> ns = this.position.getEmptyNeighbours(me, gameMap);
 		if(ns.size() == 0){
 			return this.stayStill();
 		}
@@ -79,7 +79,7 @@ public class Ship extends Entity{
 	public Command moveTowardsMineSpot(GameMap gameMap, Player me){
 		Log.logVar("INTENT", "MOVE TO MINE SPOT");
 		Log.logVar("MINE SPOT", this.mineSpot.toString());
-		gameMap.wallMap[this.x][this.y] = 100 + this.id.id;
+		gameMap.wallMap[this.position.x][this.position.y] = 100 + this.id.id;
 		return this.move(AStar.aStar(this, gameMap, me, this.mineSpot), gameMap, me);
 	}
 	public Command moveTowards(GameMap gameMap, Position goal, Player me){
@@ -88,9 +88,9 @@ public class Ship extends Entity{
 	public Command moveSuicide(final Direction direction, GameMap gameMap){
 		if(this.halite >= gameMap.at(this).halite / 10){
 			gameMap.at(this).markSafe();
-			Position meNext = this.directionalOffset(direction, gameMap);
-			this.x = meNext.x;
-			this.y = meNext.y;
+			Position meNext = this.position.directionalOffset(direction, gameMap);
+			this.position.x = meNext.x;
+			this.position.y = meNext.y;
 			gameMap.at(this).markUnsafe(this);
 			this.turnsStill = 0;
 			return Command.move(id, direction);
@@ -100,11 +100,11 @@ public class Ship extends Entity{
 	}
 	public Command move(final Direction direction, GameMap gameMap, Player me){
 		if(this.halite >= gameMap.at(this).halite / 10
-				&& gameMap.at(this.directionalOffset(direction, gameMap)).canMoveOn(me)){
+				&& gameMap.at(this.position.directionalOffset(direction, gameMap)).canMoveOn(me)){
 			gameMap.at(this).markSafe();
-			Position meNext = this.directionalOffset(direction, gameMap);
-			this.x = meNext.x;
-			this.y = meNext.y;
+			Position meNext = this.position.directionalOffset(direction, gameMap);
+			this.position.x = meNext.x;
+			this.position.y = meNext.y;
 			gameMap.at(this).markUnsafe(this);
 			this.turnsStill = 0;
 			return Command.move(id, direction);
@@ -118,7 +118,7 @@ public class Ship extends Entity{
 	public Position getClosest(GameMap gameMap, ArrayList<Position> b){
 		Position closest = b.get(0);
 		for(Position pos : b){
-			if(pos.distanceTo(this, gameMap) < closest.distanceTo(this, gameMap)){
+			if(pos.distanceTo(this.position, gameMap) < closest.distanceTo(this.position, gameMap)){
 				closest = pos;
 			}
 		}
@@ -132,12 +132,11 @@ public class Ship extends Entity{
 		this.turnsStill++;
 		return Command.move(id, Direction.STILL);
 	}
-	public void _update(Player me, int x, int y, int halite){
-		this.x = x;
-		this.y = y;
+	public void _update(Player me, Position position, int halite){
+		this.position = position;
 		this.halite = halite;
 		this.turnsAlive++;
-		if(this.samePosition(me.shipyard)){
+		if(this.position.samePosition(me.shipyard.position)){
 			this.shouldGoDeposit = false;
 		}
 	}
@@ -153,7 +152,7 @@ public class Ship extends Entity{
 		final int x = input.getInt();
 		final int y = input.getInt();
 		final int halite = input.getInt();
-		return new Ship(x, y, playerId, shipId, halite);
+		return new Ship(playerId, shipId, new Position(x, y), halite);
 	}
 	@Override
 	public boolean equals(Object o){

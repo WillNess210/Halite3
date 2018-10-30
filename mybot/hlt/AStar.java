@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class AStar{
 	public static Direction aStar(Ship s, GameMap gameMap, Player me, Position goal){
-		if(s.distanceTo(goal, gameMap) <= 1){ // if we're 1 away, don't bother with A*
+		if(s.position.distanceTo(goal, gameMap) <= 1){ // if we're 1 away, don't bother with A*
 			Log.logVar("A*", "REROUTED TO NATIVE");
 			gameMap.at(goal).aDistTraveled = 0;
 			return gameMap.naiveNavigate(s, goal, me);
@@ -17,8 +17,8 @@ public class AStar{
 		}
 		ArrayList<MapCell> open = new ArrayList<MapCell>();
 		ArrayList<MapCell> closed = new ArrayList<MapCell>();
-		gameMap.at(s.x, s.y).aDistTraveled = 0;
-		open.add(gameMap.at(s.x, s.y));
+		gameMap.at(s.position.x, s.position.y).aDistTraveled = 0;
+		open.add(gameMap.at(s.position.x, s.position.y));
 		MapCell target = null;
 		while(open.size() > 0){
 			MapCell lowest = open.get(0);
@@ -34,7 +34,7 @@ public class AStar{
 				break;
 			}
 			for(MapCell nbr : lowest.getNeighbours(gameMap)){
-				if(closed.contains(nbr) || (!nbr.canMoveOn(me) && s.distanceTo(nbr.position, gameMap) < 2)){
+				if(closed.contains(nbr) || (!nbr.canMoveOn(me) && s.position.distanceTo(nbr.position, gameMap) < 2)){
 					continue;
 				}
 				int distanceScore = lowest.aDistTraveled + 1;

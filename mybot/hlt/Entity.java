@@ -1,11 +1,12 @@
 package hlt;
-public class Entity extends Position{
+public class Entity{
 	public final PlayerId owner;
 	public final EntityId id;
-	public Entity(final int x, final int y, final PlayerId owner, final EntityId id){
-		super(x, y);
+	public Position position;
+	public Entity(final PlayerId owner, final Position position, final EntityId id){
 		this.owner = owner;
 		this.id = id;
+		this.position = position;
 	}
 	@Override
 	public boolean equals(Object o){
@@ -18,13 +19,13 @@ public class Entity extends Position{
 			return false;
 		if(!id.equals(entity.id))
 			return false;
-		return this.x == entity.x && this.y == entity.y;
+		return this.position.equals(entity.position);
 	}
 	@Override
 	public int hashCode(){
 		int result = owner.hashCode();
 		result = 31 * result + id.hashCode();
-		result = 31 * result + (31 * this.x + this.y);
+		result = 31 * result + position.hashCode();
 		return result;
 	}
 }

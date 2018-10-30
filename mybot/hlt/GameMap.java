@@ -27,7 +27,7 @@ public class GameMap{
 		return cells[normalized.y][normalized.x];
 	}
 	public MapCell at(final Entity entity){
-		return at(entity);
+		return at(entity.position);
 	}
 	public MapCell at(final int x, final int y){
 		return cells[y][x];
@@ -50,7 +50,7 @@ public class GameMap{
 		}
 		numWalls = 0;
 		// call recursive functions
-		this.tunnelRecursiveHelper(me.shipyard, minHaliteWall);
+		this.tunnelRecursiveHelper(me.shipyard.position, minHaliteWall);
 	}
 	public void tunnelRecursiveHelper(Position root, int minHaliteWall){
 		if(this.at(root).halite < minHaliteWall){
@@ -94,7 +94,7 @@ public class GameMap{
 		Log.logln("-- TUNNEL MAP --");
 		for(int j = minY; j <= maxY; j++){
 			for(int i = minX; i <= maxX; i++){
-				if(me.shipyard.x == i && me.shipyard.y == j){
+				if(me.shipyard.position.x == i && me.shipyard.position.y == j){
 					Log.log("* ");
 				}else if(wallMap[i][j] == -1){
 					Log.log("  ");
@@ -119,7 +119,7 @@ public class GameMap{
 			for(int j = 0; j < this.height; j++){
 				if(wallMap[i][j] == 1 && this.at(i, j).canMoveOn(me)){
 					Position test = new Position(i, j);
-					double score = s.distanceTo(test, this) + 3 * me.shipyard.distanceTo(test, this)
+					double score = s.position.distanceTo(test, this) + 3 * me.shipyard.position.distanceTo(test, this)
 							- 1.5 * this.at(test).factorOfHundred();
 					if(score < bestScore){
 						closest = new Position(i, j);
@@ -139,7 +139,8 @@ public class GameMap{
 		Position closest = new Position(1000, 1000);
 		for(int i = 0; i < this.width; i++){
 			for(int j = 0; j < this.height; j++){
-				if(wallMap[i][j] == 1 && s.distanceTo(new Position(i, j), this) < s.distanceTo(closest, this)){
+				if(wallMap[i][j] == 1
+						&& s.position.distanceTo(new Position(i, j), this) < s.position.distanceTo(closest, this)){
 					closest = new Position(i, j);
 				}
 			}
@@ -187,15 +188,15 @@ public class GameMap{
 	}
 	public Direction naiveNavigateSuicide(final Ship ship, final Position destination){
 		// getUnsafeMoves normalizes for us
-		for(final Direction direction : getUnsafeMoves(ship, destination)){
+		for(final Direction direction : getUnsafeMoves(ship.position, destination)){
 			return direction;
 		}
 		return Direction.STILL;
 	}
 	public Direction naiveNavigate(final Ship ship, final Position destination, Player me){
 		// getUnsafeMoves normalizes for us
-		for(final Direction direction : getUnsafeMoves(ship, destination)){
-			final Position targetPos = ship.directionalOffset(direction, this);
+		for(final Direction direction : getUnsafeMoves(ship.position, destination)){
+			final Position targetPos = ship.position.directionalOffset(direction, this);
 			if(this.at(targetPos).canMoveOn(me)){
 				return direction;
 			}

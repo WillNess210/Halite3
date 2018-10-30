@@ -35,8 +35,8 @@ public class Player{
 		ArrayList<Ship> shipsSorted = new ArrayList<Ship>();
 		EntityId firstShipID = null;
 		for(Ship ship : ships.values()){
-			int turnsHome = ship.getTurnsTo(gameMap, this.shipyard, this);
-			if(turnsHome == 0 && ship.samePosition(this.shipyard)){
+			int turnsHome = ship.getTurnsTo(gameMap, this.shipyard.position, this);
+			if(turnsHome == 0 && ship.position.samePosition(this.shipyard.position)){
 				ship.distanceToDropoff = -1;
 			}else{
 				ship.distanceToDropoff = turnsHome;
@@ -48,15 +48,15 @@ public class Player{
 		}
 		shipsSorted.sort((o1, o2) -> o1.distanceToDropoff - o2.distanceToDropoff);
 		// CHECK FOR SURROUNDED SHIPYARD
-		if(this.shipyard.getEmptyNeighbours(this, gameMap).size() == 0){
+		if(this.shipyard.position.getEmptyNeighbours(this, gameMap).size() == 0){
 			Ship lowestShip = null;
 			for(Ship ship : ships.values()){
-				if(!ship.samePosition(this.shipyard)
+				if(!ship.position.samePosition(this.shipyard.position)
 						&& (lowestShip == null || gameMap.at(ship).halite < gameMap.at(lowestShip).halite)){
 					lowestShip = ship;
 				}
 			}
-			Position highestHalite = lowestShip.getHighestHaliteEmptyNeighbour(this, gameMap);
+			Position highestHalite = lowestShip.position.getHighestHaliteEmptyNeighbour(this, gameMap);
 			Log.logln();
 			lowestShip.log();
 			Log.log("BYPASS");
@@ -121,7 +121,8 @@ public class Player{
 		for(int i = 0; i < numShips; ++i){
 			final Ship generatedShip = Ship._generate(id);
 			if(ships.keySet().contains(generatedShip.id)){
-				ships.get(generatedShip.id)._update(this, generatedShip.x, generatedShip.y, generatedShip.halite);
+				ships.get(generatedShip.id)._update(this,
+						new Position(generatedShip.position.x, generatedShip.position.y), generatedShip.halite);
 			}else{
 				ships.put(generatedShip.id, generatedShip);
 			}
@@ -140,9 +141,9 @@ public class Player{
 	}
 	public ArrayList<Position> getDropoffPoints(){
 		ArrayList<Position> dropoffPoints = new ArrayList<Position>();
-		dropoffPoints.add(this.shipyard);
+		dropoffPoints.add(this.shipyard.position);
 		for(Dropoff dropoff : this.dropoffs.values()){
-			dropoffPoints.add(dropoff);
+			dropoffPoints.add(dropoff.position);
 		}
 		return dropoffPoints;
 	}
@@ -156,6 +157,6 @@ public class Player{
 		final PlayerId playerId = new PlayerId(input.getInt());
 		final int shipyard_x = input.getInt();
 		final int shipyard_y = input.getInt();
-		return new Player(playerId, new Shipyard(shipyard_x, shipyard_y, playerId));
+		return new Player(playerId, new Shipyard(playerId, new Position(shipyard_x, shipyard_y)));
 	}
 }
