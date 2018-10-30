@@ -197,7 +197,7 @@ public class GameMap{
 		// getUnsafeMoves normalizes for us
 		for(final Direction direction : getUnsafeMoves(ship.position, destination)){
 			final Position targetPos = ship.position.directionalOffset(direction, this);
-			if(this.at(targetPos).canMoveOn(me)){
+			if(this.at(targetPos).canMoveOn(me) || (targetPos.samePosition(me.shipyard.position) && me.startSuicide)){
 				return direction;
 			}
 		}
