@@ -3,7 +3,6 @@ import hlt.*;
 // TODO use ship planner to start dropoffs, choose wall closest to most Halite
 // TODO don't always move to the same spot in bottom right, choose random safe spot (use for gym)
 // TODO test the following using gym, maybe force 48x48 map for simplicity : numShips
-// TODO test github
 public class MyBot{
 	public static void main(final String[] args){
 		Game game = new Game();
