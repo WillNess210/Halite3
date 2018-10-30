@@ -68,6 +68,9 @@ public class Ship extends Entity{
 		AStar.aStar(this, gameMap, me, b);
 		return this.getTurnsToAfter(gameMap, b);
 	}
+	public boolean canMove(GameMap gameMap){
+		return this.halite > gameMap.at(this).halite / 10 || gameMap.at(this).halite < 10;
+	}
 	public boolean isFull(){
 		return this.halite >= Constants.MAX_HALITE;
 	}

@@ -61,7 +61,7 @@ public class GameMap{
 	}
 	public void fillSwapMap(Player me){
 		for(Ship ship : me.ships.values()){
-			if(ship.halite >= this.at(ship).halite / 10){
+			if(ship.canMove(this)){
 				swapMap[ship.position.x][ship.position.y] += 2;
 				Position[] ns = ship.position.getNeighbours(this);
 				for(Position n : ns){
